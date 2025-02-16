@@ -42,4 +42,5 @@ public interface MandelState<T extends Number> {
    void setMandelHeight(int mandelHeight);
 
    void resetCoordinates();
+   int getMaxIterations();
 }
