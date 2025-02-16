@@ -7,6 +7,7 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
   private double savedZoom = zoom;
   private boolean juliaToggle = false;
   private boolean saveToggle = false;
+  private boolean performanceToggle = false;
   private int mandelWidth;
   private int mandelHeight;
   private int maxIterations;
@@ -23,6 +24,7 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
     this.savedZoom = mandelState.getSavedZoom();
     this.juliaToggle = mandelState.isJuliaToggled();
     this.saveToggle = mandelState.isSaveToggled();
+    this.performanceToggle = mandelState.isPerformanceToggled();
     this.mandelWidth = mandelState.getMandelWidth();
     this.mandelHeight = mandelState.getMandelHeight();
     this.maxIterations = mandelState.getMaxIterations();
@@ -45,6 +47,11 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
   }
 
   @Override
+  public boolean isPerformanceToggled() {
+    return performanceToggle;
+  }
+
+  @Override
   public void toggleJulia() {
     this.juliaToggle = !juliaToggle;
   }
@@ -52,6 +59,11 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
   @Override
   public void toggleSave() {
     this.saveToggle = !saveToggle;
+  }
+
+  @Override
+  public void togglePerformance() {
+    this.performanceToggle = !performanceToggle;
   }
 
   @Override

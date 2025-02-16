@@ -9,19 +9,23 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-public class MandelbrotImpl implements Mandelbrot {
+public class CpuMandelbrotImpl implements CpuMandelbrot {
   private static final BigDecimal FOUR = new BigDecimal(4, new MathContext(50, RoundingMode.HALF_DOWN));
+
   @Override
   public int mandelbrotAt(int x, int y, MandelState mandelState) {
-
-    if (mandelState instanceof MandelDoubleState doubleState) {
+    if (mandelState.isPerformanceToggled() && (x % mandelState.maxSkipped() == 0 || y % mandelState.maxSkipped() == 0)) {
+      return mandelState.getMaxIterations();
+    } else if (mandelState instanceof MandelDoubleState doubleState) {
       final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
       final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
       return mandelbrot(new Complex(real, imaginary), mandelState.getMaxIterations());
+
     } else if (mandelState instanceof MandelBigDecimalState decimalState) {
       final BigDecimal real = Mapping.mapComplex(decimalState.getDecimalCache()[x], decimalState.getDecimalCache()[mandelState.getMandelWidth()], decimalState.getMinX(), decimalState.getMaxX(), decimalState.getMathContext());
       final BigDecimal imaginary = Mapping.mapComplex(decimalState.getDecimalCache()[y], decimalState.getDecimalCache()[mandelState.getMandelHeight()], decimalState.getMinY(), decimalState.getMaxY(), decimalState.getMathContext());
       return mandelbrot(real, imaginary, decimalState.getMaxIterations(), decimalState.getMathContext());
+
     } else {
       throw new UnsupportedOperationException("State Not Implemented");
     }

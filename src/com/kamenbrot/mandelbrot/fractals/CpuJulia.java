@@ -2,7 +2,7 @@ package com.kamenbrot.mandelbrot.fractals;
 
 import com.kamenbrot.mandelbrot.state.MandelState;
 
-public interface Julia {
+public interface CpuJulia {
 
   int juliaAt(int x, int y, MandelState mandelState);
 

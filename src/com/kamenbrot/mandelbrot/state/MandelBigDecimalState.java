@@ -10,20 +10,20 @@ import java.util.Map;
 
 public class MandelBigDecimalState extends MandelStateAbstract<BigDecimal> {
 
+  private static final BigDecimal MIN_X = BigDecimal.valueOf(GenericMandelState.MIN_X);
+  private static final BigDecimal MAX_X = BigDecimal.valueOf(GenericMandelState.MAX_X);
+  private static final BigDecimal MIN_Y = BigDecimal.valueOf(GenericMandelState.MIN_Y);
+  private static final BigDecimal MAX_Y = BigDecimal.valueOf(GenericMandelState.MAX_Y);
+  private static BigDecimal[] decimalCache;
+  private static final Map<Double, BigDecimal> decimalMapCache = new HashMap<>();
 
   private BigDecimal centerX = BigDecimal.ZERO;
   private BigDecimal centerY = BigDecimal.ZERO;
-  private MathContext mathContext = new MathContext(24, RoundingMode.HALF_UP);
-  private BigDecimal MIN_X = new BigDecimal(GenericMandelState.MIN_X, mathContext);
-  private BigDecimal MAX_X = new BigDecimal(GenericMandelState.MAX_X, mathContext);
-  private BigDecimal MIN_Y = new BigDecimal(GenericMandelState.MIN_Y, mathContext);
-  private BigDecimal MAX_Y = new BigDecimal(GenericMandelState.MAX_Y, mathContext);
+  private MathContext mathContext = new MathContext(20, RoundingMode.HALF_UP);
   private BigDecimal minX = MIN_X;
   private BigDecimal maxX = MAX_X;
   private BigDecimal minY = MIN_Y;
   private BigDecimal maxY = MAX_Y;
-  private static BigDecimal[] decimalCache;
-  private static Map<Double, BigDecimal> decimalMapCache = new HashMap<>();
 
   public MandelBigDecimalState(int maxIterations, int mandelWidth, int mandelHeight) {
     super(maxIterations, mandelWidth, mandelHeight);

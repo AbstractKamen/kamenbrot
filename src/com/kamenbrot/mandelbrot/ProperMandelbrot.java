@@ -2,10 +2,10 @@ package com.kamenbrot.mandelbrot;
 
 import com.kamenbrot.mandelbrot.colors.CoolColors;
 import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
-import com.kamenbrot.mandelbrot.fractals.Julia;
-import com.kamenbrot.mandelbrot.fractals.JuliaImpl;
-import com.kamenbrot.mandelbrot.fractals.Mandelbrot;
-import com.kamenbrot.mandelbrot.fractals.MandelbrotImpl;
+import com.kamenbrot.mandelbrot.fractals.CpuJulia;
+import com.kamenbrot.mandelbrot.fractals.CpuJuliaImpl;
+import com.kamenbrot.mandelbrot.fractals.CpuMandelbrot;
+import com.kamenbrot.mandelbrot.fractals.CpuMandelbrotImpl;
 import com.kamenbrot.mandelbrot.state.MandelBigDecimalState;
 import com.kamenbrot.mandelbrot.state.MandelDoubleState;
 import com.kamenbrot.mandelbrot.state.MandelState;
@@ -29,30 +29,29 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ProperMandelbrot extends JPanel {
-  public static final double SWITCH_STATE = 9999.0;
+  public static final double SWITCH_STATE = 20;
 
   private static String OUTPUT_PATH = "out/mandelbrot";
-  private static final int MAX_ITERATIONS = 1400;
-  private static final int BLOCK_SIZE = 32;
+  private static final int MAX_ITERATIONS = 1200;
+  private static final int BLOCK_SIZE = 31;
 
   private static Color[] PALETTE = CoolColors.getCoolColors69();
 
   private final BufferedImage image;
   private final Color[] colors;
-  private final int[] mandelCache;
   private final String identifier;
+  private final int[] mandelCache;
   private MandelState mandelState;
-  private final Mandelbrot mandelbrot;
-  private final Julia julia;
+  private final CpuMandelbrot mandelbrot;
+  private final CpuJulia julia;
 
 
   public ProperMandelbrot() {
-    this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 600, 400);
-    this.mandelbrot = new MandelbrotImpl();
-    this.julia = new JuliaImpl();
+    this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 480, 320);
+    this.mandelbrot = new CpuMandelbrotImpl();
+    this.julia = new CpuJuliaImpl();
     this.colors = PaletteGenerator.generatePalette(PALETTE, 256);
     final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     this.mandelCache = new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()];
@@ -74,6 +73,11 @@ public class ProperMandelbrot extends JPanel {
             panel.mandelState.toggleSave();
             panel.repaint();
             break;
+          case 'p':
+            panel.mandelState.togglePerformance();
+            panel.generateImage();
+            panel.repaint();
+            break;
           case 'j':
             panel.mandelState.toggleJulia();
             panel.mandelState.resetCoordinates();
@@ -88,12 +92,8 @@ public class ProperMandelbrot extends JPanel {
                   })
                   .thenAccept(v -> panel.generateImage())
                   .thenAccept(v -> panel.repaint())
-                  .get(10, TimeUnit.SECONDS);
-              } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-              } catch (ExecutionException ex) {
-                throw new RuntimeException(ex);
-              } catch (TimeoutException ex) {
+                  .get();
+              } catch (InterruptedException | ExecutionException ex) {
                 throw new RuntimeException(ex);
               }
             }
@@ -209,7 +209,8 @@ public class ProperMandelbrot extends JPanel {
 
   private void generateFractal(int x, int y, BinaryIntFunc atFunc) {
     int blockSize = BLOCK_SIZE;
-    while (blockSize > 2) {
+
+    while (blockSize > 11) {
       // Ensure we don't go out of bounds
       int x1 = Math.min(x, mandelState.getMandelWidth() - 1);
       int y1 = Math.min(y, mandelState.getMandelHeight() - 1);
@@ -236,7 +237,7 @@ public class ProperMandelbrot extends JPanel {
         }
         break;
       } else {
-        blockSize = blockSize >> 1;
+        blockSize = blockSize - 11;
       }
     }
     for (int i = 0; i < BLOCK_SIZE; i++) {

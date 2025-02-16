@@ -17,9 +17,12 @@ public interface MandelState {
 
   boolean isJuliaToggled();
   boolean isSaveToggled();
+  boolean isPerformanceToggled();
+  default int  maxSkipped() {return 2;}
 
   void toggleJulia();
   void toggleSave();
+  void togglePerformance();
 
   int getMandelHeight();
   int getMandelWidth();
