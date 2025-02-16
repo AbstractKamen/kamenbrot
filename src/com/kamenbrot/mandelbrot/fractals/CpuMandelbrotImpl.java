@@ -14,21 +14,22 @@ public class CpuMandelbrotImpl implements CpuMandelbrot {
 
   @Override
   public int mandelbrotAt(int x, int y, MandelState mandelState) {
-    if (mandelState.isPerformanceToggled() && (x % mandelState.maxSkipped() == 0 || y % mandelState.maxSkipped() == 0)) {
-      return mandelState.getMaxIterations();
-    } else if (mandelState instanceof MandelDoubleState doubleState) {
-      final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
-      final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
-      return mandelbrot(new Complex(real, imaginary), mandelState.getMaxIterations());
-
-    } else if (mandelState instanceof MandelBigDecimalState decimalState) {
-      final BigDecimal real = Mapping.mapComplex(decimalState.getDecimalCache()[x], decimalState.getDecimalCache()[mandelState.getMandelWidth()], decimalState.getMinX(), decimalState.getMaxX(), decimalState.getMathContext());
-      final BigDecimal imaginary = Mapping.mapComplex(decimalState.getDecimalCache()[y], decimalState.getDecimalCache()[mandelState.getMandelHeight()], decimalState.getMinY(), decimalState.getMaxY(), decimalState.getMathContext());
-      return mandelbrot(real, imaginary, decimalState.getMaxIterations(), decimalState.getMathContext());
-
-    } else {
-      throw new UnsupportedOperationException("State Not Implemented");
-    }
+    return switch (mandelState) {
+      case MandelState s when s.isPerformanceToggled() && (x % s.maxSkipped() == 0 && y % s.maxSkipped() == 0) -> {
+        yield mandelState.getMaxIterations();
+      }
+      case MandelDoubleState doubleState -> {
+        final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
+        final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
+        yield mandelbrot(new Complex(real, imaginary), mandelState.getMaxIterations());
+      }
+      case MandelBigDecimalState decimalState -> {
+        final BigDecimal real = Mapping.mapComplex(decimalState.getDecimalCache()[x], decimalState.getDecimalCache()[mandelState.getMandelWidth()], decimalState.getMinX(), decimalState.getMaxX(), decimalState.getMathContext());
+        final BigDecimal imaginary = Mapping.mapComplex(decimalState.getDecimalCache()[y], decimalState.getDecimalCache()[mandelState.getMandelHeight()], decimalState.getMinY(), decimalState.getMaxY(), decimalState.getMathContext());
+        yield mandelbrot(real, imaginary, decimalState.getMaxIterations(), decimalState.getMathContext());
+      }
+      default -> throw new UnsupportedOperationException("State Not Implemented");
+    };
   }
 
   private int mandelbrot(BigDecimal real, BigDecimal imaginary, int maxIterations, MathContext mc) {
@@ -48,7 +49,6 @@ public class CpuMandelbrotImpl implements CpuMandelbrot {
     }
     return n;
   }
-
 
   private int mandelbrot(Complex c, int maxIterations) {
     Complex z = new Complex(0, 0);

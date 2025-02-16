@@ -11,9 +11,8 @@ public class Mapping {
 
   public static BigDecimal mapComplex(BigDecimal value, BigDecimal limit, BigDecimal min, BigDecimal max, MathContext mc) {
     return min.add(value
-        .divide(limit, mc)
-        .multiply(max.subtract(min, mc), mc),
-    mc);
+                     .divide(limit, mc)
+                     .multiply(max.subtract(min, mc), mc),
+                   mc);
   }
-
 }
