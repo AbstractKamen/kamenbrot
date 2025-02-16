@@ -1,6 +1,5 @@
 package com.kamenbrot.mandelbrot.fractals;
 
-import com.kamenbrot.mandelbrot.Mapping;
 import com.kamenbrot.mandelbrot.complex.Complex;
 import com.kamenbrot.mandelbrot.state.MandelState;
 

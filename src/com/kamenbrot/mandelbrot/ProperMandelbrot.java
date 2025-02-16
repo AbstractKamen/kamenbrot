@@ -1,5 +1,7 @@
 package com.kamenbrot.mandelbrot;
 
+import com.kamenbrot.mandelbrot.colors.CoolColors;
+import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
 import com.kamenbrot.mandelbrot.fractals.Julia;
 import com.kamenbrot.mandelbrot.fractals.JuliaDouble;
 import com.kamenbrot.mandelbrot.fractals.Mandelbrot;

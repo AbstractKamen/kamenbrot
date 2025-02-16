@@ -1,6 +1,6 @@
 package com.kamenbrot.mandelbrot.state;
 
-import com.kamenbrot.mandelbrot.Mapping;
+import com.kamenbrot.mandelbrot.fractals.Mapping;
 
 public class MandelDoubleState implements MandelState<Double> {
 

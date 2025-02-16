@@ -1,4 +1,4 @@
-package com.kamenbrot.mandelbrot;
+package com.kamenbrot.mandelbrot.fractals;
 
 public class Mapping {
 
