@@ -2,8 +2,8 @@ package com.kamenbrot.mandelbrot.fractals;
 
 import com.kamenbrot.mandelbrot.state.MandelState;
 
-public interface Mandelbrot<T extends Number> {
+public interface Mandelbrot {
 
-  int mandelbrotAt(int x, int y, MandelState<T> mandelState);
+  int mandelbrotAt(int x, int y, MandelState mandelState);
 
 }

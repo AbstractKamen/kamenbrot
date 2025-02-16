@@ -1,46 +1,34 @@
 package com.kamenbrot.mandelbrot.state;
 
-public interface MandelState<T extends Number> {
+public interface MandelState {
+  void incrementZoomFactor();
+  void decrementZoomFactor();
 
-    double MIN_X = -2.0;
-    double MAX_X = 1.0;
-    double MIN_Y = -1.5;
-    double MAX_Y = 1.5;
+  void zoomIn( int units);
+  void zoomOut(int units);
 
-    T getCenterX();
-    T getCenterY();
+  double getCurrentZoom();
+  double getZoomFactor();
 
-    T getMinX();
-    T getMinY();
-    T getMaxX();
-    T getMaxY();
+  void saveCurrentZoom();
+  double getSavedZoom();
 
-    void incrementZoomFactor();
-    void decrementZoomFactor();
+  void setCenter(int x, int y);
 
-    void zoomIn( int units);
-    void zoomOut(int units);
+  boolean isJuliaToggled();
+  boolean isSaveToggled();
 
-    double getCurrentZoom();
-    double getZoomFactor();
+  void toggleJulia();
+  void toggleSave();
 
-    void saveCurrentZoom();
-    double getSavedZoom();
+  int getMandelHeight();
+  int getMandelWidth();
 
-    void setCenter(int x, int y);
+  void setMandelWidth(int mandelWidth);
+  void setMandelHeight(int mandelHeight);
 
-    boolean isJuliaToggled();
-    boolean isSaveToggled();
+  void resetCoordinates();
+  int getMaxIterations();
 
-    void toggleJulia();
-    void toggleSave();
-
-   int getMandelHeight();
-   int getMandelWidth();
-
-   void setMandelWidth(int mandelWidth);
-   void setMandelHeight(int mandelHeight);
-
-   void resetCoordinates();
-   int getMaxIterations();
+  MandelState translate();
 }

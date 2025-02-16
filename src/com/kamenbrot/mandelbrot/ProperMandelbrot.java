@@ -3,9 +3,10 @@ package com.kamenbrot.mandelbrot;
 import com.kamenbrot.mandelbrot.colors.CoolColors;
 import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
 import com.kamenbrot.mandelbrot.fractals.Julia;
-import com.kamenbrot.mandelbrot.fractals.JuliaDouble;
+import com.kamenbrot.mandelbrot.fractals.JuliaImpl;
 import com.kamenbrot.mandelbrot.fractals.Mandelbrot;
-import com.kamenbrot.mandelbrot.fractals.MandelbrotDouble;
+import com.kamenbrot.mandelbrot.fractals.MandelbrotImpl;
+import com.kamenbrot.mandelbrot.state.MandelBigDecimalState;
 import com.kamenbrot.mandelbrot.state.MandelDoubleState;
 import com.kamenbrot.mandelbrot.state.MandelState;
 
@@ -31,25 +32,27 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class ProperMandelbrot extends JPanel {
+  public static final double SWITCH_STATE = 9999.0;
 
   private static String OUTPUT_PATH = "out/mandelbrot";
   private static final int MAX_ITERATIONS = 1400;
-  private static final int BLOCK_SIZE = 8;
+  private static final int BLOCK_SIZE = 32;
 
-  private static Color[] PALETTE = CoolColors.getCoolColors2();
+  private static Color[] PALETTE = CoolColors.getCoolColors69();
 
   private final BufferedImage image;
   private final Color[] colors;
   private final int[] mandelCache;
   private final String identifier;
-  private final MandelState<Double> mandelState;
-  private final Mandelbrot<Double> mandelbrot;
-  private final Julia<Double> julia;
+  private MandelState mandelState;
+  private final Mandelbrot mandelbrot;
+  private final Julia julia;
+
 
   public ProperMandelbrot() {
-    this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 800, 600);
-    this.mandelbrot = new MandelbrotDouble();
-    this.julia = new JuliaDouble();
+    this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 600, 400);
+    this.mandelbrot = new MandelbrotImpl();
+    this.julia = new JuliaImpl();
     this.colors = PaletteGenerator.generatePalette(PALETTE, 256);
     final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     this.mandelCache = new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()];
@@ -71,7 +74,7 @@ public class ProperMandelbrot extends JPanel {
             panel.mandelState.toggleSave();
             panel.repaint();
             break;
-          case 't':
+          case 'j':
             panel.mandelState.toggleJulia();
             panel.mandelState.resetCoordinates();
             panel.generateImage();
@@ -81,7 +84,7 @@ public class ProperMandelbrot extends JPanel {
             while (panel.mandelState.getCurrentZoom() < panel.mandelState.getSavedZoom()) {
               try {
                 CompletableFuture.runAsync(() -> {
-                    panel.mandelState.zoomIn(1);
+                    zoomIn(1, panel);
                   })
                   .thenAccept(v -> panel.generateImage())
                   .thenAccept(v -> panel.repaint())
@@ -98,17 +101,23 @@ public class ProperMandelbrot extends JPanel {
           case 'h':
             panel.mandelState.saveCurrentZoom();
             panel.mandelState.resetCoordinates();
+            if (panel.mandelState.getSavedZoom() > SWITCH_STATE && panel.mandelState instanceof MandelBigDecimalState) {
+              panel.mandelState = panel.mandelState.translate();
+            }
             panel.generateImage();
             panel.repaint();
             break;
           case '+':
             panel.mandelState.incrementZoomFactor();
+            panel.repaint();
+            break;
+          case 't':
+            panel.mandelState = panel.mandelState.translate();
             panel.generateImage();
             panel.repaint();
             break;
           case '-':
             panel.mandelState.decrementZoomFactor();
-            panel.generateImage();
             panel.repaint();
             break;
         }
@@ -126,10 +135,14 @@ public class ProperMandelbrot extends JPanel {
 
       @Override
       public void mouseWheelMoved(MouseWheelEvent e) {
+        final MandelState state = panel.mandelState;
         if (e.getPreciseWheelRotation() < 0) {
-          panel.mandelState.zoomIn(e.getScrollAmount());
+          zoomIn(e.getScrollAmount(), panel);
         } else {
-          panel.mandelState.zoomOut(e.getScrollAmount());
+          if (state.getCurrentZoom() < SWITCH_STATE && state instanceof MandelBigDecimalState) {
+            panel.mandelState = state.translate();
+          }
+          state.zoomOut(e.getScrollAmount());
         }
         panel.generateImage();
         panel.repaint();
@@ -140,12 +153,20 @@ public class ProperMandelbrot extends JPanel {
 
     frame.addKeyListener(saveKey);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setMaximumSize(new Dimension(panel.mandelState.getMandelWidth(), panel.mandelState.getMandelWidth()));
-    frame.setMinimumSize(new Dimension(panel.mandelState.getMandelHeight(), panel.mandelState.getMandelHeight()));
+    frame.setMaximumSize(new Dimension(panel.mandelState.getMandelWidth(), panel.mandelState.getMandelHeight()));
+    frame.setMinimumSize(new Dimension(panel.mandelState.getMandelWidth(), panel.mandelState.getMandelHeight()));
     frame.add(panel);
     frame.pack();
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
+  }
+
+  private static void zoomIn(int units, ProperMandelbrot panel) {
+    MandelState state = panel.mandelState;
+    state.zoomIn(units);
+    if (state.getCurrentZoom() > SWITCH_STATE && state instanceof MandelDoubleState) {
+      panel.mandelState = state.translate();
+    }
   }
 
   private void generateImage() {
@@ -263,7 +284,6 @@ public class ProperMandelbrot extends JPanel {
     if (iterations == MAX_ITERATIONS) return Color.BLACK;
     return colors[iterations % colors.length];
   }
-
 }
 
 interface BinaryIntFunc {
