@@ -34,12 +34,12 @@ public class MandelBigDecimalState extends MandelStateAbstract<BigDecimal> {
 
   public MandelBigDecimalState(MandelDoubleState mandelState) {
     super(mandelState);
-    this.minX = BigDecimal.valueOf(mandelState.getMinX()).setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-    this.maxX = BigDecimal.valueOf(mandelState.getMaxX()).setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-    this.minY = BigDecimal.valueOf(mandelState.getMinY()).setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-    this.maxY = BigDecimal.valueOf(mandelState.getMaxY()).setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-    this.centerX = BigDecimal.valueOf(mandelState.getCenterX()).setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
-    this.centerY = BigDecimal.valueOf(mandelState.getCenterY()).setScale(mathContext.getPrecision(), mathContext.getRoundingMode());
+    this.minX = new BigDecimal(Double.toString(mandelState.getMinX()), mathContext);
+    this.maxX = new BigDecimal(Double.toString(mandelState.getMaxX()), mathContext);
+    this.minY = new BigDecimal(Double.toString(mandelState.getMinY()), mathContext);
+    this.maxY = new BigDecimal(Double.toString(mandelState.getMaxY()), mathContext);
+    this.centerX = new BigDecimal(Double.toString(mandelState.getCenterX()), mathContext);
+    this.centerY = new BigDecimal(Double.toString(mandelState.getCenterY()), mathContext);
     if (decimalCache == null) {
       decimalCache = initCache(getMandelWidth(), getMandelHeight());
     }
@@ -50,7 +50,7 @@ public class MandelBigDecimalState extends MandelStateAbstract<BigDecimal> {
     final BigDecimal[] decimalCache = new BigDecimal[len]; ;
 
     for (int i = 0; i < len; ++i) {
-      decimalCache[i] = BigDecimal.valueOf(i);
+      decimalCache[i] = new BigDecimal(Double.toString(i), mathContext);
     }
     return decimalCache;
   }

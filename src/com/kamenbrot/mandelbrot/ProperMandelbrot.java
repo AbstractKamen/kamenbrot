@@ -25,17 +25,16 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 public class ProperMandelbrot extends JPanel {
-  public static final double SWITCH_STATE = 20;
+  public static final double SWITCH_STATE = 9999999;
 
-  private static String OUTPUT_PATH = "out/mandelbrot";
-  private static final int MAX_ITERATIONS = 1200;
-  private static final int BLOCK_SIZE = 31;
+  private static final String OUTPUT_PATH = "out/mandelbrot";
+  private static final int MAX_ITERATIONS = 2400;
+  private static final int BLOCK_SIZE = 128;
+  private static final int OPTIMIZATION_BLOCK_SIZE = 8;
 
   private static Color[] PALETTE = CoolColors.getCoolColors69();
 
@@ -49,10 +48,10 @@ public class ProperMandelbrot extends JPanel {
 
 
   public ProperMandelbrot() {
-    this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 480, 320);
+    this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 800, 600);
     this.mandelbrot = new CpuMandelbrotImpl();
     this.julia = new CpuJuliaImpl();
-    this.colors = PaletteGenerator.generatePalette(PALETTE, 256);
+    this.colors = PaletteGenerator.generatePalette(PALETTE, 512);
     final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     this.mandelCache = new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()];
     this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
@@ -85,17 +84,11 @@ public class ProperMandelbrot extends JPanel {
             panel.repaint();
             break;
           case 'g':
-            while (panel.mandelState.getCurrentZoom() < panel.mandelState.getSavedZoom()) {
-              try {
-                CompletableFuture.runAsync(() -> {
-                    zoomIn(1, panel);
-                  })
-                  .thenAccept(v -> panel.generateImage())
-                  .thenAccept(v -> panel.repaint())
-                  .get();
-              } catch (InterruptedException | ExecutionException ex) {
-                throw new RuntimeException(ex);
-              }
+            final double savedZoom = panel.mandelState.getSavedZoom();
+            while (Double.compare(panel.mandelState.getCurrentZoom(), savedZoom) <= 0) {
+              zoomIn(1, panel);
+              panel.generateImage();
+              panel.repaint();
             }
             break;
           case 'h':
@@ -208,14 +201,22 @@ public class ProperMandelbrot extends JPanel {
   }
 
   private void generateFractal(int x, int y, BinaryIntFunc atFunc) {
-    int blockSize = BLOCK_SIZE;
+    for (int i = 0; i < BLOCK_SIZE; i += OPTIMIZATION_BLOCK_SIZE) {
+      for (int j = 0; j < BLOCK_SIZE; j += OPTIMIZATION_BLOCK_SIZE) {
+        generateFractalBlock(x + j, y + i, atFunc, OPTIMIZATION_BLOCK_SIZE);
+      }
+    }
+  }
 
-    while (blockSize > 11) {
+  private void generateFractalBlock(int x, int y, BinaryIntFunc atFunc, int blockSize) {
+    int optimizationBlockSize = blockSize;
+
+    while (optimizationBlockSize > 2) {
       // Ensure we don't go out of bounds
       int x1 = Math.min(x, mandelState.getMandelWidth() - 1);
       int y1 = Math.min(y, mandelState.getMandelHeight() - 1);
-      int x2 = Math.min(x + blockSize, mandelState.getMandelWidth() - 1);
-      int y2 = Math.min(y + blockSize, mandelState.getMandelHeight() - 1);
+      int x2 = Math.min(x + optimizationBlockSize, mandelState.getMandelWidth() - 1);
+      int y2 = Math.min(y + optimizationBlockSize, mandelState.getMandelHeight() - 1);
 
       int c1 = mandelCache[x1 + mandelState.getMandelWidth() * y1] = atFunc.apply(x1, y1);
       int c2 = mandelCache[x2 + mandelState.getMandelWidth() * y1] = atFunc.apply(x2, y1);
@@ -225,8 +226,8 @@ public class ProperMandelbrot extends JPanel {
       // If all corners are black, fill the entire block as black
       if (c1 == MAX_ITERATIONS && c2 == MAX_ITERATIONS &&
         c3 == MAX_ITERATIONS && c4 == MAX_ITERATIONS) {
-        for (int i = 0; i < blockSize; i++) {
-          for (int j = 0; j < blockSize; j++) {
+        for (int i = 0; i < optimizationBlockSize; i++) {
+          for (int j = 0; j < optimizationBlockSize; j++) {
             int px = x + i;
             int py = y + j;
             if (px < mandelState.getMandelWidth() && py < mandelState.getMandelHeight()) {
@@ -237,11 +238,11 @@ public class ProperMandelbrot extends JPanel {
         }
         break;
       } else {
-        blockSize = blockSize - 11;
+        optimizationBlockSize = optimizationBlockSize >> 1;
       }
     }
-    for (int i = 0; i < BLOCK_SIZE; i++) {
-      for (int j = 0; j < BLOCK_SIZE; j++) {
+    for (int i = 0; i < blockSize; i++) {
+      for (int j = 0; j < blockSize; j++) {
         int px = x + i;
         int py = y + j;
         if (px < mandelState.getMandelWidth() && py < mandelState.getMandelHeight()) {
@@ -263,18 +264,19 @@ public class ProperMandelbrot extends JPanel {
     super.paintComponent(g);
     g.drawImage(image, 0, 0, null);
     g.setColor(Color.GREEN);
-    g.drawString(String.format("Press '+' or '-' to adjust zoom factor. Currently %.2f", mandelState.getZoomFactor()), 25, 50);
-    g.drawString(String.format("Press 'H' to reset zoom and mouse wheel to adjust zoom. Current zoom %.2fx", mandelState.getCurrentZoom()), 25, 25);
-    g.drawString("Press 'S' to save on zoom. Currently " + (mandelState.isSaveToggled() ? "active" : "inactive"), mandelState.getMandelWidth() >> 1, 50);
+    g.drawString(String.format("Press '+' or '-' to adjust zoom factor. Currently %.2f. Current mandelbrot: %s", mandelState.getZoomFactor(), mandelState.getClass().getSimpleName()), 15, 15);
+    g.drawString(String.format("Press 'H' to reset zoom and mouse wheel to adjust zoom. Current zoom %.2fx. Saved zoom %.2fx", mandelState.getCurrentZoom(), mandelState.getSavedZoom()), 15, 30);
+    g.drawString("Press 'S' to save on zoom. Currently " + (mandelState.isSaveToggled() ? "active" : "inactive"), 15, 45);
   }
 
   private void saveImage() {
     if (mandelState.isSaveToggled()) {
       try {
-        final File output = Paths.get(OUTPUT_PATH + "/" + identifier + "/" + System.currentTimeMillis() + ".jpg").toFile();
-        output.mkdirs();
-        output.createNewFile();
-        ImageIO.write(image, "jpg", output);
+        final File dirFile = Paths.get(OUTPUT_PATH + "/" + identifier).toFile();
+        dirFile.mkdirs();
+        final File outputImage = new File(dirFile, System.currentTimeMillis() + ".jpg");
+        outputImage.createNewFile();
+        ImageIO.write(image, "jpg", outputImage);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

@@ -17,7 +17,7 @@ public interface GenericMandelState<T extends Number> extends MandelState {
     T getMaxX();
     T getMaxY();
 
-  default MathContext getMathContext() {
-    return MathContext.DECIMAL64;
-  }
+    default MathContext getMathContext() {
+      return MathContext.DECIMAL64;
+    }
 }

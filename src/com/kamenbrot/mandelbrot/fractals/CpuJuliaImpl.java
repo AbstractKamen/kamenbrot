@@ -42,7 +42,7 @@ public class CpuJuliaImpl implements CpuJulia {
 
   private static int julia(Complex z, int maxIterations) {
     int n = 0;
-    while (z.abs() <= 2 && n < maxIterations) {
+    while (z.re() * z.re() + z.im() * z.im() <= 4 && n < maxIterations) {
       z = z.times(z).plus(JULIA_START);
       n++;
     }

@@ -2,7 +2,7 @@ package com.kamenbrot.mandelbrot.state;
 
 public abstract class MandelStateAbstract<T extends Number> implements GenericMandelState<T> {
 
-  private double zoomFactor = 0.2;
+  private double zoomFactor = 0.1;
   private double zoom = 1;
   private double savedZoom = zoom;
   private boolean juliaToggle = false;
@@ -93,25 +93,25 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
 
   @Override
   public void incrementZoomFactor() {
-    this.zoomFactor = Math.min(1, zoomFactor + 0.1);
+    this.zoomFactor = Math.min(0.95, zoomFactor + 0.05);
   }
 
   @Override
   public void decrementZoomFactor() {
-    this.zoomFactor = Math.max(0.1, zoomFactor - 0.1);
+    this.zoomFactor = Math.max(0.05, zoomFactor - 0.05);
   }
 
   @Override
   public void zoomIn(int units) {
     double z = 1 - zoomFactor;
-    this.zoom += 1 * zoomFactor;
+    this.zoom += z;
     calcZoom(z);
   }
 
   @Override
   public void zoomOut(int units) {
-    double z = 1 + 1 * zoomFactor;
-    this.zoom -= 1 * zoomFactor;
+    double z = 1 + zoomFactor;
+    this.zoom -= z;
     calcZoom(z);
   }
 
