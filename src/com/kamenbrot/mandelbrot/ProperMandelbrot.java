@@ -35,7 +35,7 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
 
     public ProperMandelbrot() {
-        this.panelState = new PanelState(800, 600, CoolColors.getCoolColors1(), 32);
+        this.panelState = new PanelState(800, 600, CoolColors.getCoolColors1(), 64);
         this.mandelState = new MandelDoubleState(panelState);
         this.mandelbrot = new CpuMandelbrotImpl();
         this.julia = new CpuJuliaImpl();
@@ -71,6 +71,11 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
                         break;
                     case 'G':
                         panel.makeGif();
+                        break;
+                    case 'S':
+                        panel.mandelState.toggleSmooth();
+                        panel.generateImage();
+                        panel.repaint();
                         break;
                     case 'g':
                         while (!panel.mandelState.isZoomInReached()) {

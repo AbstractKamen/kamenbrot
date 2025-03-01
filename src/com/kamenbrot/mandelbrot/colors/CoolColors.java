@@ -133,4 +133,25 @@ public class CoolColors {
         c[15] = new Color(66, 15, 30);
         return c;
     }
+
+    public static Color[] getCoolColors5_forSmooth() {
+        Color[] c = new Color[16];
+        c[0] = new Color(134, 181, 229);
+        c[1] = new Color(211, 236, 248);
+        c[2] = new Color(241, 233, 191);
+        c[3] = new Color(248, 201, 95);
+        c[4] = new Color(255, 170, 0);
+        c[5] = new Color(204, 128, 0);
+        c[6] = new Color(153, 87, 0);
+        c[7] = new Color(106, 52, 3);
+        c[8] = new Color(66, 30, 15);
+        c[9] = new Color(25, 7, 26);
+        c[10] = new Color(9, 1, 47);
+        c[11] = new Color(4, 4, 73);
+        c[12] = new Color(0, 7, 100);
+        c[13] = new Color(12, 44, 138);
+        c[14] = new Color(24, 82, 177);
+        c[15] = new Color(57, 125, 209);
+        return c;
+    }
 }

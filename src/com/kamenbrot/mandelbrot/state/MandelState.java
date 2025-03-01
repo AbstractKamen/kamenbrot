@@ -19,8 +19,11 @@ public interface MandelState {
   boolean isJuliaToggled();
   boolean isSaveToggled();
   boolean isPerformanceToggled();
+  boolean isSmoothToggled();
+
   default int  maxSkipped() {return 2;}
 
+  void toggleSmooth();
   void toggleJulia();
   void toggleSave();
   void togglePerformance();
@@ -33,5 +36,4 @@ public interface MandelState {
 
   void resetCoordinates();
   int getMaxIterations();
-
 }

@@ -72,6 +72,19 @@ public class PanelState {
         return colors[iterations % colors.length];
     }
 
+    public Color getColor_smooth(int iterations) {
+        if (iterations == maxIterations) return Color.BLACK; // Escape case
+
+        double normalized = (double) iterations / maxIterations; // Normalize to [0,1]
+        double exponent = 1.5; // S value (adjust for different effects)
+        int paletteSize = colors.length; // N in the formula
+
+        double v = Math.pow(normalized, exponent) * paletteSize; // Exponentially scale
+        int index = (int) v % paletteSize; // Keep within palette bounds
+
+        return colors[index];
+    }
+
     public void doubleColors() {
         this.colors = PaletteGenerator.generatePalette(palette, colors.length << 1);
     }

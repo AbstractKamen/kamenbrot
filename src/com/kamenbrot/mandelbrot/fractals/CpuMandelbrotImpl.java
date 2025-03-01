@@ -20,7 +20,11 @@ public class CpuMandelbrotImpl implements CpuMandelbrot {
       case MandelDoubleState doubleState -> {
         final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
         final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
-        yield mandelbrot(new Complex(real, imaginary), mandelState.getMaxIterations());
+        if (mandelState.isSaveToggled()) {
+          yield Fractal.fractalIteration_smooth(new Complex(0, 0), mandelState.getMaxIterations(), new Complex(real, imaginary));
+        } else {
+          yield Fractal.fractalIteration(new Complex(0, 0), mandelState.getMaxIterations(), new Complex(real, imaginary));
+        }
       }
       default -> throw new UnsupportedOperationException("State Not Implemented");
     };
@@ -42,16 +46,5 @@ public class CpuMandelbrotImpl implements CpuMandelbrot {
       n++;
     }
     return n;
-  }
-
-  private int mandelbrot(Complex c, int maxIterations) {
-    Complex z = new Complex(0, 0);
-    int n = 0;
-    while (z.abs() <= 2 && n < maxIterations) {
-      z = z.times(z).plus(c);
-      n++;
-    }
-    return n;
-
   }
 }
