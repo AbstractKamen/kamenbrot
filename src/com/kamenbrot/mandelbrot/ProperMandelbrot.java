@@ -1,27 +1,21 @@
 package com.kamenbrot.mandelbrot;
 
 import com.kamenbrot.mandelbrot.colors.CoolColors;
-import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
 import com.kamenbrot.mandelbrot.fractals.CpuJulia;
 import com.kamenbrot.mandelbrot.fractals.CpuJuliaImpl;
 import com.kamenbrot.mandelbrot.fractals.CpuMandelbrot;
 import com.kamenbrot.mandelbrot.fractals.CpuMandelbrotImpl;
+import com.kamenbrot.mandelbrot.io.GifSequenceWriter;
 import com.kamenbrot.mandelbrot.state.MandelDoubleState;
 import com.kamenbrot.mandelbrot.state.MandelState;
+import com.kamenbrot.mandelbrot.state.PanelState;
 
-import javax.imageio.*;
-import javax.imageio.metadata.IIOInvalidTreeException;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
-import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -32,19 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
-    private static final String OUTPUT_PATH = "out/mandelbrot";
-    private static final int MAX_ITERATIONS = 1200;
-    private static final int BLOCK_SIZE = 128;
-    private static final int OPTIMIZATION_BLOCK_SIZE = 2;
-    private static final int ZOOM_UNITS = 1;
-    private static final int JOURNEY_UNITS = 1;
-
-    private static Color[] PALETTE = CoolColors.getCoolColors2();
-
-    private final BufferedImage image;
-    private final Color[] colors;
-    private final String identifier;
-    private final int[] mandelCache;
+    private int[] mandelCache;
+    private PanelState panelState;
     private MandelState mandelState;
     private final CpuMandelbrot mandelbrot;
     private final CpuJulia julia;
@@ -52,18 +35,17 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
 
     public ProperMandelbrot() {
-        this.mandelState = new MandelDoubleState(MAX_ITERATIONS, 800, 600);
+        this.panelState = new PanelState(800, 600, CoolColors.getCoolColors1(), 32);
+        this.mandelState = new MandelDoubleState(panelState);
         this.mandelbrot = new CpuMandelbrotImpl();
         this.julia = new CpuJuliaImpl();
-        this.colors = PaletteGenerator.generatePalette(PALETTE, 2 << 8);
         final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.mandelCache = new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()];
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
-        this.image = new BufferedImage(mandelState.getMandelWidth(), mandelState.getMandelHeight(), BufferedImage.TYPE_INT_RGB);
-        this.identifier = LocalDateTime.now().toString().replace(':', '-');
         this.pool = (ForkJoinPool) Executors.newWorkStealingPool();
         generateImage();
     }
+
     public static void main(String[] args) {
         final JFrame frame = new JFrame("Mandelbrot Set");
         final ProperMandelbrot panel = new ProperMandelbrot();
@@ -92,7 +74,7 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
                         break;
                     case 'g':
                         while (!panel.mandelState.isZoomInReached()) {
-                            zoomIn(JOURNEY_UNITS, panel);
+                            zoomIn(panel.panelState.getJourneyUnits(), panel);
                             panel.generateImage();
                             panel.repaint();
                         }
@@ -128,9 +110,9 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 final MandelState state = panel.mandelState;
                 if (e.getPreciseWheelRotation() < 0) {
-                    zoomIn(ZOOM_UNITS, panel);
+                    zoomIn(panel.panelState.getZoomUnits(), panel);
                 } else {
-                    state.zoomOut(ZOOM_UNITS);
+                    state.zoomOut(panel.panelState.getZoomUnits());
                 }
                 panel.generateImage();
                 panel.repaint();
@@ -141,8 +123,24 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
         frame.addKeyListener(saveKey);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setMaximumSize(new Dimension(panel.mandelState.getMandelWidth(), panel.mandelState.getMandelHeight()));
+        frame.addComponentListener(new ComponentAdapter() {
+
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                Component c = e.getComponent();
+                panel.panelState.setWidthAndHeight(c.getWidth(), c.getHeight());
+                panel.mandelState.setMandelWidth(c.getWidth());
+                panel.mandelState.setMandelHeight(c.getHeight());
+                panel.mandelCache = new int[c.getWidth() * c.getHeight()];
+                panel.generateImage();
+                panel.repaint();
+            }
+
+        });
         frame.setMinimumSize(new Dimension(panel.mandelState.getMandelWidth(), panel.mandelState.getMandelHeight()));
+        frame.setMaximumSize(new Dimension(1600, 1200));
         frame.add(panel);
         frame.pack();
         frame.setLocationRelativeTo(null);
@@ -165,9 +163,10 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
     }
 
     private void generateMandelbrot() {
+        final int blockSize = panelState.getBlockSize();
         Arrays.fill(mandelCache, -1);
-        for (int x = 0; x < mandelState.getMandelWidth(); x += BLOCK_SIZE) {
-            for (int y = 0; y < mandelState.getMandelHeight(); y += BLOCK_SIZE) {
+        for (int x = 0; x < mandelState.getMandelWidth(); x += blockSize) {
+            for (int y = 0; y < mandelState.getMandelHeight(); y += blockSize) {
                 final int X = x, Y = y;
                 pool.execute(() -> generateFractal(X, Y, this::mandelbrotAt));
             }
@@ -179,9 +178,10 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
     }
 
     private void generateJulia() {
+        final int blockSize = panelState.getBlockSize();
         Arrays.fill(mandelCache, -1);
-        for (int x = 0; x < mandelState.getMandelWidth(); x += BLOCK_SIZE) {
-            for (int y = 0; y < mandelState.getMandelHeight(); y += BLOCK_SIZE) {
+        for (int x = 0; x < mandelState.getMandelWidth(); x += blockSize) {
+            for (int y = 0; y < mandelState.getMandelHeight(); y += blockSize) {
                 final int X = x, Y = y;
                 pool.execute(() -> generateFractal(X, Y, this::juliaAt));
             }
@@ -193,9 +193,11 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
     }
 
     private void generateFractal(int x, int y, BinaryIntFunc atFunc) {
-        for (int i = 0; i < BLOCK_SIZE; i += OPTIMIZATION_BLOCK_SIZE) {
-            for (int j = 0; j < BLOCK_SIZE; j += OPTIMIZATION_BLOCK_SIZE) {
-                generateFractalBlock(x + j, y + i, atFunc, OPTIMIZATION_BLOCK_SIZE);
+        final int optimizationBlockSize = panelState.getOptimizationBlockSize();
+        final int blockSize = panelState.getBlockSize();
+        for (int i = 0; i < blockSize; i += optimizationBlockSize) {
+            for (int j = 0; j < blockSize; j += optimizationBlockSize) {
+                generateFractalBlock(x + j, y + i, atFunc, optimizationBlockSize);
             }
         }
     }
@@ -216,15 +218,16 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
             int c4 = mandelCache[x2 + mandelState.getMandelWidth() * y2] = atFunc.apply(x2, y2);
 
             // If all corners are black, fill the entire block as black
-            if (c1 == MAX_ITERATIONS && c2 == MAX_ITERATIONS &&
-                    c3 == MAX_ITERATIONS && c4 == MAX_ITERATIONS) {
+            int maxIterations = panelState.getMaxIterations();
+            if (c1 == maxIterations && c2 == maxIterations &&
+                    c3 == maxIterations && c4 == maxIterations) {
                 for (int i = 0; i < optimizationBlockSize; i++) {
                     for (int j = 0; j < optimizationBlockSize; j++) {
                         int px = x + i;
                         int py = y + j;
                         if (px < mandelState.getMandelWidth() && py < mandelState.getMandelHeight()) {
-                            image.setRGB(px, py, Color.BLACK.getRGB());
-                            mandelCache[px + mandelState.getMandelWidth() * py] = MAX_ITERATIONS;
+                            panelState.getImage().setRGB(px, py, Color.BLACK.getRGB());
+                            mandelCache[px + mandelState.getMandelWidth() * py] = maxIterations;
                         }
                     }
                 }
@@ -242,9 +245,9 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
                     int it;
                     if ((it = mandelCache[index]) == -1) {
-                        it = mandelCache[index] = atFunc.apply(px, py) ;
+                        it = mandelCache[index] = atFunc.apply(px, py);
                     }
-                    image.setRGB(px, py, getColor(it).getRGB());
+                    panelState.getImage().setRGB(px, py, panelState.getColor(it).getRGB());
                 }
             }
         }
@@ -257,9 +260,9 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
     @Override
     protected void paintComponent(Graphics g) {
-//        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         super.paintComponent(g);
-        g.drawImage(image, 0, 0, null);
+        g.drawImage(panelState.getImage(), 0, 0, null);
         g.setColor(Color.GREEN);
         g.drawString(String.format("Press '+' or '-' to adjust zoom factor. Currently %.2f. Current mandelbrot: %s", mandelState.getZoomFactor(), mandelState.getClass().getSimpleName()), 15, 15);
         g.drawString(String.format("Press 'H' to reset zoom and mouse wheel to adjust zoom. Current zoom %.2fx.", mandelState.getCurrentZoom()), 15, 30);
@@ -268,34 +271,16 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
     private void saveImage() {
         if (mandelState.isSaveToggled()) {
-            try {
-                final File dirFile = Paths.get(OUTPUT_PATH + "/" + identifier).toFile();
-                dirFile.mkdirs();
-                final File outputImage = new File(dirFile, System.currentTimeMillis() + ".jpg");
-                outputImage.createNewFile();
-                ImageIO.write(image, "jpg", outputImage);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            panelState.saveImage();
         }
     }
 
     private void makeGif() {
-        final File dirFile = Paths.get(OUTPUT_PATH + "/" + identifier).toFile();
-
-        final ImageTypeSpecifier spec = ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_INT_RGB);
-        final ImageWriter wr = ImageIO.getImageWriters(spec, "GIF").next();
-        final ImageWriteParam param = wr.getDefaultWriteParam();
-
-        final IIOMetadata metadata = wr.getDefaultImageMetadata(spec, param);
-        configureRootMetadata(metadata, 5, true);
+        final File dirFile = panelState.getOutputDir();
         // list the files before making the output gif
         final File[] frames = Objects.requireNonNull(dirFile.listFiles(), "no saved frames found");
 
-        try {
-            final ImageOutputStream os = ImageIO.createImageOutputStream(new File(dirFile, identifier + ".gif"));
-            wr.setOutput(os);
-            wr.prepareWriteSequence(null);
+        try (final GifSequenceWriter writer = new GifSequenceWriter(7, dirFile, panelState.getIdentifier())) {
 
             final List<File> sortedFrames = Arrays.stream(frames)
                     .sorted(Comparator.comparingLong(f -> {
@@ -304,62 +289,14 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
                     }))
                     .toList();
             for (File frameFile : sortedFrames) {
-                wr.writeToSequence(new IIOImage(ImageIO.read(frameFile), null, metadata), param);
+                writer.writeToSequence(ImageIO.read(frameFile));
             }
-            wr.endWriteSequence();
-            os.close();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    // https://memorynotfound.com/generate-gif-image-java-delay-infinite-loop-example/
-    private void configureRootMetadata(IIOMetadata metadata, int delay, boolean loopContinuously) {
-        final String metaFormatName = metadata.getNativeMetadataFormatName();
-        final IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree(metaFormatName);
-
-        final IIOMetadataNode graphicsControlExtensionNode = getNode(root, "GraphicControlExtension");
-        graphicsControlExtensionNode.setAttribute("disposalMethod", "none");
-        graphicsControlExtensionNode.setAttribute("userInputFlag", "FALSE");
-        graphicsControlExtensionNode.setAttribute("transparentColorFlag", "FALSE");
-        graphicsControlExtensionNode.setAttribute("delayTime", delay + "");
-        graphicsControlExtensionNode.setAttribute("transparentColorIndex", "0");
-
-        // IIOMetadataNode commentsNode = getNode(root, "CommentExtensions");
-        // commentsNode.setAttribute("CommentExtension", "Created by: https://memorynotfound.com");
-
-        final IIOMetadataNode appExtensionsNode = getNode(root, "ApplicationExtensions");
-        final IIOMetadataNode child = new IIOMetadataNode("ApplicationExtension");
-        child.setAttribute("applicationID", "NETSCAPE");
-        child.setAttribute("authenticationCode", "2.0");
-
-        final byte loop = (byte) (loopContinuously ? 0 : 1);
-
-        child.setUserObject(new byte[]{1, loop, 0});
-        appExtensionsNode.appendChild(child);
-
-        try {
-            metadata.setFromTree(metaFormatName, root);
-        } catch (IIOInvalidTreeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static IIOMetadataNode getNode(IIOMetadataNode rootNode, String nodeName) {
-        for (int i = 0; i < rootNode.getLength(); i++) {
-            if (rootNode.item(i).getNodeName().equalsIgnoreCase(nodeName)) {
-                return (IIOMetadataNode) rootNode.item(i);
-            }
-        }
-        final IIOMetadataNode node = new IIOMetadataNode(nodeName);
-        rootNode.appendChild(node);
-        return (node);
-    }
-
-    private Color getColor(int iterations) {
-        if (iterations == MAX_ITERATIONS) return Color.BLACK;
-        return colors[iterations % colors.length];
-    }
 }
 
 interface BinaryIntFunc {
