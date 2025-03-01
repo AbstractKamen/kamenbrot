@@ -11,7 +11,8 @@ public interface MandelState {
   double getZoomFactor();
 
   void saveCurrentZoom();
-  double getSavedZoom();
+  boolean isZoomInReached();
+  boolean isZoomOutReached();
 
   void setCenter(int x, int y);
 
@@ -33,5 +34,4 @@ public interface MandelState {
   void resetCoordinates();
   int getMaxIterations();
 
-  MandelState translate();
 }

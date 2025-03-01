@@ -1,7 +1,6 @@
 package com.kamenbrot.mandelbrot.fractals;
 
 import com.kamenbrot.mandelbrot.complex.Complex;
-import com.kamenbrot.mandelbrot.state.MandelBigDecimalState;
 import com.kamenbrot.mandelbrot.state.MandelDoubleState;
 import com.kamenbrot.mandelbrot.state.MandelState;
 
@@ -22,11 +21,6 @@ public class CpuMandelbrotImpl implements CpuMandelbrot {
         final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
         final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
         yield mandelbrot(new Complex(real, imaginary), mandelState.getMaxIterations());
-      }
-      case MandelBigDecimalState decimalState -> {
-        final BigDecimal real = Mapping.mapComplex(decimalState.getDecimalCache()[x], decimalState.getDecimalCache()[mandelState.getMandelWidth()], decimalState.getMinX(), decimalState.getMaxX(), decimalState.getMathContext());
-        final BigDecimal imaginary = Mapping.mapComplex(decimalState.getDecimalCache()[y], decimalState.getDecimalCache()[mandelState.getMandelHeight()], decimalState.getMinY(), decimalState.getMaxY(), decimalState.getMathContext());
-        yield mandelbrot(real, imaginary, decimalState.getMaxIterations(), decimalState.getMathContext());
       }
       default -> throw new UnsupportedOperationException("State Not Implemented");
     };

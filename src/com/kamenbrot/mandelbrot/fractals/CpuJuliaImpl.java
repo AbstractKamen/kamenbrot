@@ -1,7 +1,6 @@
 package com.kamenbrot.mandelbrot.fractals;
 
 import com.kamenbrot.mandelbrot.complex.Complex;
-import com.kamenbrot.mandelbrot.state.MandelBigDecimalState;
 import com.kamenbrot.mandelbrot.state.MandelDoubleState;
 import com.kamenbrot.mandelbrot.state.MandelState;
 
@@ -14,12 +13,12 @@ public class CpuJuliaImpl implements CpuJulia {
   //    private static final Complex JULIA_START = new Complex(0.285, 0.01);
   //    private static final Complex JULIA_START = new Complex(-0.7381, 0.2816);
   private static final Complex JULIA_START = new Complex(-1.768778833, -0.001738996);
+  //    private static final Complex JULIA_START = new Complex(-0.3092, 0.6353);
+  //    private static final Complex JULIA_START = new Complex(0.2438, 0.5598);
+//      private static final Complex JULIA_START = new Complex(0.2438, 0.5598);
   public static final BigDecimal JULIA_IMAG = BigDecimal.valueOf(JULIA_START.im());
   public static final BigDecimal JULIA_REAL = BigDecimal.valueOf(JULIA_START.re());
 
-  //    private static final Complex JULIA_START = new Complex(-0.3092, 0.6353);
-  //    private static final Complex JULIA_START = new Complex(0.2438, 0.5598);
-  //    private static final Complex JULIA_START = new Complex(0.2438, 0.5598);
   @Override
   public int juliaAt(int x, int y, MandelState mandelState) {
     return switch (mandelState) {
@@ -30,11 +29,6 @@ public class CpuJuliaImpl implements CpuJulia {
         final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
         final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
         yield julia(new Complex(real, imaginary), mandelState.getMaxIterations());
-      }
-      case MandelBigDecimalState decimalState -> {
-        final BigDecimal real = Mapping.mapComplex(decimalState.getDecimalCache()[x], decimalState.getDecimalCache()[mandelState.getMandelWidth()], decimalState.getMinX(), decimalState.getMaxX(), decimalState.getMathContext());
-        final BigDecimal imaginary = Mapping.mapComplex(decimalState.getDecimalCache()[y], decimalState.getDecimalCache()[mandelState.getMandelHeight()], decimalState.getMinY(), decimalState.getMaxY(), decimalState.getMathContext());
-        yield julia(real, imaginary, decimalState.getMaxIterations(), decimalState.getMathContext());
       }
       default -> throw new UnsupportedOperationException("State Not Implemented");
     };

@@ -10,19 +10,9 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
   private double maxY = MAX_Y;
   private double centerX;
   private double centerY;
-
+  private double savedMaxX = maxX;
   public MandelDoubleState(int maxIterations, int mandelWidth, int mandelHeight) {
     super(maxIterations, mandelWidth, mandelHeight);
-  }
-
-  public MandelDoubleState(MandelBigDecimalState mandelState) {
-    super(mandelState);
-    this.minX = mandelState.getMinX().doubleValue();
-    this.maxX = mandelState.getMaxX().doubleValue();
-    this.minY = mandelState.getMinY().doubleValue();
-    this.maxY = mandelState.getMaxY().doubleValue();
-    this.centerX = mandelState.getCenterX().doubleValue();
-    this.centerY = mandelState.getCenterY().doubleValue();
   }
 
   @Override
@@ -71,11 +61,18 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
     calcZoom(super.setZoom(1));
   }
 
-  @Override
-  public MandelState translate() {
-    return new MandelBigDecimalState(this);
+  @Override  public void saveCurrentZoom() {
+    this.savedMaxX = maxX;
   }
 
+  @Override
+  public boolean isZoomInReached() {
+    return savedMaxX >= maxX;
+  }
+  @Override
+  public boolean isZoomOutReached() {
+    return savedMaxX <= maxX;
+  }
 
   @Override
   protected void calcZoom(double z) {
