@@ -1,9 +1,9 @@
-package com.kamenbrot.mandelbrot.fractals;
+package com.kamenbrot.fractals;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-public class Mapping {
+public class ComplexMapping {
 
   public static double mapComplex(int value, int limit, double min, double max) {
     return min + (double) value / limit * (max - min);

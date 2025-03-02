@@ -1,4 +1,4 @@
-package com.kamenbrot.mandelbrot.state;
+package com.kamenbrot.state;
 
 import java.awt.*;
 import java.util.Map;

@@ -1,8 +1,9 @@
-package com.kamenbrot.mandelbrot.fractals;
+package com.kamenbrot.fractals.mandelbrot;
 
-import com.kamenbrot.mandelbrot.complex.Complex;
-import com.kamenbrot.mandelbrot.state.MandelDoubleState;
-import com.kamenbrot.mandelbrot.state.MandelState;
+import com.kamenbrot.fractals.Complex;
+import com.kamenbrot.fractals.ComplexMapping;
+import com.kamenbrot.state.MandelDoubleState;
+import com.kamenbrot.state.MandelState;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -25,8 +26,8 @@ public class CpuJulia {
                 yield mandelState.getMaxIterations();
             }
             case MandelDoubleState doubleState -> {
-                final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
-                final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
+                final double real = ComplexMapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
+                final double imaginary = ComplexMapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
                 if (mandelState.isSmoothToggled()) {
                     yield CpuMandelbrot.fractalIteration_smooth(new Complex(real, imaginary), mandelState.getMaxIterations(), JULIA_START);
                 } else {

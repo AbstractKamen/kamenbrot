@@ -1,4 +1,4 @@
-package com.kamenbrot.mandelbrot.complex;
+package com.kamenbrot.fractals;
 
 import java.util.Objects;
 

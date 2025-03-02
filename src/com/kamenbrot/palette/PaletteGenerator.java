@@ -1,4 +1,4 @@
-package com.kamenbrot.mandelbrot.colors;
+package com.kamenbrot.palette;
 
 import java.awt.*;
 import java.util.Arrays;

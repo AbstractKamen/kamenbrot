@@ -1,16 +1,20 @@
-package com.kamenbrot.mandelbrot.ui;
+package com.kamenbrot.ui;
 
-import com.kamenbrot.mandelbrot.ProperMandelbrot;
-import com.kamenbrot.mandelbrot.fractals.JuliaBlockImageGenerator;
-import com.kamenbrot.mandelbrot.fractals.MandelbrotBlockImageGenerator;
-import com.kamenbrot.mandelbrot.state.MandelState;
-import com.kamenbrot.mandelbrot.state.PanelState;
+import com.kamenbrot.ProperMandelbrot;
+import com.kamenbrot.generators.JuliaBlockImageGenerator;
+import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
+import com.kamenbrot.io.MandelOutput;
+import com.kamenbrot.state.MandelState;
+import com.kamenbrot.state.PanelState;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class MandelKeyListener extends KeyAdapter {
-
+    /**
+     * One hundredth of a second (1/100)
+     */
+    private static final int GIF_FRAME_DELAY_CENTI_SECONDS = 6;
     private final MandelState mandelState;
     private final PanelState panelState;
     private final ProperMandelbrot parentComponent;
@@ -37,15 +41,15 @@ public class MandelKeyListener extends KeyAdapter {
                 mandelState.toggleJulia();
                 mandelState.resetCoordinates();
                 if (mandelState.isJuliaToggled()) {
-                    parentComponent.setImageGenerator(new JuliaBlockImageGenerator(parentComponent.getPool(), mandelState, panelState));
+                    parentComponent.setImageGenerator(new JuliaBlockImageGenerator(parentComponent.getImageGenerator(), mandelState, panelState));
                 } else {
-                    parentComponent.setImageGenerator(new MandelbrotBlockImageGenerator(parentComponent.getPool(), mandelState, panelState));
+                    parentComponent.setImageGenerator(new MandelbrotBlockImageGenerator(parentComponent.getImageGenerator(), mandelState, panelState));
                 }
                 parentComponent.getImageGenerator().generateImage();
                 parentComponent.repaint();
                 break;
             case 'G':
-                MandelOutput.makeGif(panelState.getOutputDir(), panelState.getIdentifier());
+                MandelOutput.makeGif(panelState.getOutputDir(), panelState.getIdentifier(), GIF_FRAME_DELAY_CENTI_SECONDS);
                 break;
             case 'S':
                 mandelState.toggleSmooth();

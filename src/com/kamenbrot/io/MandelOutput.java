@@ -1,6 +1,4 @@
-package com.kamenbrot.mandelbrot.ui;
-
-import com.kamenbrot.mandelbrot.io.GifSequenceWriter;
+package com.kamenbrot.io;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -30,15 +28,15 @@ public class MandelOutput {
     }
 
 
-    public static void makeGif(String outputPath, String gifName) {
-        makeGif(Paths.get(outputPath).toFile(), gifName);
+    public static void makeGif(String outputPath, String gifName, int delay) {
+        makeGif(Paths.get(outputPath).toFile(), gifName, delay);
     }
 
-    public static void makeGif(File dirFile, String gifName) {
+    public static void makeGif(File dirFile, String gifName, int delay) {
         // list the files before making the output gif
         final File[] frames = Objects.requireNonNull(dirFile.listFiles(), "no saved frames found");
 
-        try (final GifSequenceWriter writer = new GifSequenceWriter(7, dirFile, gifName)) {
+        try (final GifSequenceWriter writer = new GifSequenceWriter(delay, dirFile, gifName)) {
 
             final List<File> sortedFrames = Arrays.stream(frames)
                     .sorted(Comparator.comparingLong(f -> {

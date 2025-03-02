@@ -1,4 +1,4 @@
-package com.kamenbrot.mandelbrot.fractals;
+package com.kamenbrot.generators;
 
 import java.awt.image.BufferedImage;
 

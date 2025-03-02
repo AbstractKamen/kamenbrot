@@ -1,29 +1,25 @@
-package com.kamenbrot.mandelbrot;
+package com.kamenbrot;
 
-import com.kamenbrot.mandelbrot.colors.CoolColors;
-import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
-import com.kamenbrot.mandelbrot.fractals.ImageGenerator;
-import com.kamenbrot.mandelbrot.fractals.MandelbrotBlockImageGenerator;
-import com.kamenbrot.mandelbrot.state.MandelDoubleState;
-import com.kamenbrot.mandelbrot.state.MandelState;
-import com.kamenbrot.mandelbrot.state.PanelState;
-import com.kamenbrot.mandelbrot.ui.MandelKeyListener;
-import com.kamenbrot.mandelbrot.ui.MandelOutput;
+import com.kamenbrot.generators.ImageGenerator;
+import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
+import com.kamenbrot.io.MandelOutput;
+import com.kamenbrot.palette.CoolColors;
+import com.kamenbrot.palette.PaletteGenerator;
+import com.kamenbrot.state.MandelDoubleState;
+import com.kamenbrot.state.MandelState;
+import com.kamenbrot.state.PanelState;
+import com.kamenbrot.ui.MandelKeyListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 public class ProperMandelbrot extends JPanel {
 
     private PanelState panelState;
     private MandelState mandelState;
     private ImageGenerator imageGenerator;
-    private final ForkJoinPool pool;
 
 
     public ProperMandelbrot() {
@@ -35,8 +31,7 @@ public class ProperMandelbrot extends JPanel {
 //        final Color[] palette = PaletteGenerator.getLayeredColors(PaletteGenerator.generatePalette(CoolColors.getCoolColors5(), 64), 2);
         this.panelState = new PanelState(800, 600, palette);
         this.mandelState = new MandelDoubleState(panelState, new ConcurrentHashMap<>());
-        this.pool = (ForkJoinPool) Executors.newWorkStealingPool();
-        this.imageGenerator = new MandelbrotBlockImageGenerator(pool, mandelState, panelState);
+        this.imageGenerator = new MandelbrotBlockImageGenerator(mandelState, panelState);
         final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
         generateAndSaveImageIfToggled();
@@ -46,7 +41,6 @@ public class ProperMandelbrot extends JPanel {
     protected void paintComponent(Graphics g) {
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         super.paintComponent(g);
-        while (!pool.awaitQuiescence(5, TimeUnit.SECONDS)) ;
         g.drawImage(imageGenerator.getImage(), 0, 0, null);
         g.setColor(Color.GREEN);
         g.drawString(String.format("Press '+' or '-' to adjust zoom factor. Currently %.2f. Current mandelbrot: %s", mandelState.getZoomFactor(), mandelState.getClass().getSimpleName()), 15, 15);
@@ -56,7 +50,6 @@ public class ProperMandelbrot extends JPanel {
 
     public void generateAndSaveImageIfToggled() {
         imageGenerator.generateImage();
-        while (!pool.awaitQuiescence(5, TimeUnit.SECONDS)) ;
         if (mandelState.isSaveToggled()) {
             MandelOutput.saveImage(panelState.getOutputDir(), imageGenerator.getImage());
         }
@@ -64,10 +57,6 @@ public class ProperMandelbrot extends JPanel {
 
     public ImageGenerator getImageGenerator() {
         return imageGenerator;
-    }
-
-    public ForkJoinPool getPool() {
-        return pool;
     }
 
     public PanelState getPanelState() {

@@ -1,6 +1,6 @@
-package com.kamenbrot.mandelbrot.state;
+package com.kamenbrot.state;
 
-import com.kamenbrot.mandelbrot.fractals.Mapping;
+import com.kamenbrot.fractals.ComplexMapping;
 
 import java.awt.*;
 import java.util.Map;
@@ -55,8 +55,8 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
 
     @Override
     public void setCenter(int x, int y) {
-        this.centerX = Mapping.mapComplex(x, getMandelWidth(), minX, maxX);
-        this.centerY = Mapping.mapComplex(y, getMandelHeight(), minY, maxY);
+        this.centerX = ComplexMapping.mapComplex(x, getMandelWidth(), minX, maxX);
+        this.centerY = ComplexMapping.mapComplex(y, getMandelHeight(), minY, maxY);
         calcZoom(1);
     }
 

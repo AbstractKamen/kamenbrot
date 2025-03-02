@@ -1,6 +1,6 @@
-package com.kamenbrot.mandelbrot.state;
+package com.kamenbrot.state;
 
-import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
+import com.kamenbrot.palette.PaletteGenerator;
 
 import java.awt.*;
 import java.io.File;

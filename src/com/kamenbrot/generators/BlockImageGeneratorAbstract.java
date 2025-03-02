@@ -1,14 +1,19 @@
-package com.kamenbrot.mandelbrot.fractals;
+package com.kamenbrot.generators;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 public abstract class BlockImageGeneratorAbstract implements ImageGenerator {
 
     private final ForkJoinPool pool;
     private int blockSize;
 
-    public BlockImageGeneratorAbstract(ForkJoinPool pool, int blockSize) {
+    protected BlockImageGeneratorAbstract(BlockImageGeneratorAbstract imageGenerator) {
+        this(imageGenerator.getPool(), imageGenerator.getBlockSize());
+    }
+
+    protected BlockImageGeneratorAbstract(ForkJoinPool pool, int blockSize) {
         this.pool = pool;
         this.blockSize = blockSize;
     }
@@ -18,6 +23,10 @@ public abstract class BlockImageGeneratorAbstract implements ImageGenerator {
 
     protected void setBlockSize(int blockSize) {
         this.blockSize = blockSize;
+    }
+
+    protected ForkJoinPool getPool() {
+        return pool;
     }
 
     @Override
@@ -30,6 +39,7 @@ public abstract class BlockImageGeneratorAbstract implements ImageGenerator {
                 pool.execute(() -> generateBlock(X, Y));
             }
         }
+        while (!pool.awaitQuiescence(10, TimeUnit.SECONDS)) ;
     }
 
     protected int getBlockSize() {

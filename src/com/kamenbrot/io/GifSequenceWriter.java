@@ -1,4 +1,4 @@
-package com.kamenbrot.mandelbrot.io;
+package com.kamenbrot.io;
 
 import javax.imageio.*;
 import javax.imageio.metadata.IIOInvalidTreeException;
