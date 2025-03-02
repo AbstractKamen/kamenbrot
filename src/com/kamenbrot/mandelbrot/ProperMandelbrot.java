@@ -1,6 +1,7 @@
 package com.kamenbrot.mandelbrot;
 
 import com.kamenbrot.mandelbrot.colors.CoolColors;
+import com.kamenbrot.mandelbrot.colors.PaletteGenerator;
 import com.kamenbrot.mandelbrot.fractals.CpuJulia;
 import com.kamenbrot.mandelbrot.fractals.CpuJuliaImpl;
 import com.kamenbrot.mandelbrot.fractals.CpuMandelbrot;
@@ -35,7 +36,12 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
 
 
     public ProperMandelbrot() {
-        this.panelState = new PanelState(800, 600, CoolColors.getCoolColors1(), 64);
+        final Color[] layer1 = PaletteGenerator.generatePalette(CoolColors.getCoolColors1(), 16);
+        final Color[] layer2 = PaletteGenerator.generatePalette(CoolColors.getCoolColors69(), 16);
+        final Color[] layer3 = PaletteGenerator.generatePalette(CoolColors.getCoolColors2(), 16);
+        final Color[] layer4 = PaletteGenerator.generatePalette(CoolColors.getCoolColors420(), 16);
+        final Color[] palette = PaletteGenerator.getLayeredColors(layer1, layer2, layer3, layer4);
+        this.panelState = new PanelState(800, 600, palette);
         this.mandelState = new MandelDoubleState(panelState);
         this.mandelbrot = new CpuMandelbrotImpl();
         this.julia = new CpuJuliaImpl();
@@ -252,7 +258,11 @@ public class ProperMandelbrot extends JPanel implements AutoCloseable {
                     if ((it = mandelCache[index]) == -1) {
                         it = mandelCache[index] = atFunc.apply(px, py);
                     }
-                    panelState.getImage().setRGB(px, py, panelState.getColor(it).getRGB());
+                    if (mandelState.isSmoothToggled()) {
+                        panelState.getImage().setRGB(px, py, panelState.getColor_smooth(it).getRGB());
+                    } else {
+                        panelState.getImage().setRGB(px, py, panelState.getColor(it).getRGB());
+                    }
                 }
             }
         }

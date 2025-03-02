@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class PanelState {
 
     private static final String OUTPUT_PATH = "out/mandelbrot";
-    private static final int MAX_ITERATIONS = 1200;
+    private static final int MAX_ITERATIONS = 1400;
     private static final int BLOCK_SIZE = 128;
     private static final int OPTIMIZATION_BLOCK_SIZE = 2;
     private static final int ZOOM_UNITS = 1;
@@ -33,11 +33,11 @@ public class PanelState {
     private int width;
     private int height;
 
-    public PanelState(int width, int height, Color[] palette, int colorsLength) {
+    public PanelState(int width, int height, Color[] palette) {
         this.identifier = LocalDateTime.now().toString().replace(':', '-');
         this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         this.palette = palette;
-        this.colors = PaletteGenerator.generatePalette(palette, colorsLength);
+        this.colors = PaletteGenerator.generatePalette(palette, palette.length);
         this.maxIterations = MAX_ITERATIONS;
         this.zoomUnits = ZOOM_UNITS;
         this.journeyUnits = JOURNEY_UNITS;

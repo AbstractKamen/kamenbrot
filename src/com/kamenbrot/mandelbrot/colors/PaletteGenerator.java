@@ -5,6 +5,25 @@ import java.util.Arrays;
 
 public class PaletteGenerator {
 
+    public static Color[] getLayeredColors(Color[] c, int layers) {
+        final Color[] r = new Color[c.length * layers];
+        for (int i = 0; i < r.length; i++) {
+            r[i] = c[i % c.length];
+        }
+        return r;
+    }
+
+    public static Color[] getLayeredColors(Color[]... c) {
+        if (c.length == 0 || c[0].length == 0) return new Color[0];
+        final Color[] r = new Color[c.length * c[0].length];
+        for (int i = 0, k = 0; i < c.length; i++) {
+            for (int j = 0; j < c[i].length; j++) {
+                r[k++] = c[i][j];
+            }
+        }
+        return r;
+    }
+
     public static Color[] generatePalette(Color[] baseColors, int newSize) {
         if (newSize <= baseColors.length) return Arrays.copyOf(baseColors, baseColors.length);
         final Color[] expandedPalette = new Color[newSize];

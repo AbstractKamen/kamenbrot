@@ -28,7 +28,7 @@ public class CpuJuliaImpl implements CpuJulia {
             case MandelDoubleState doubleState -> {
                 final double real = Mapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
                 final double imaginary = Mapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
-                if (mandelState.isSaveToggled()) {
+                if (mandelState.isSmoothToggled()) {
                     yield Fractal.fractalIteration_smooth(new Complex(real, imaginary), mandelState.getMaxIterations(), JULIA_START);
                 } else {
                     yield Fractal.fractalIteration(new Complex(real, imaginary), mandelState.getMaxIterations(), JULIA_START);
