@@ -51,6 +51,7 @@ public class PaletteGenerator {
         } else {
             expandedPalette[newSize - 1] = baseColors[baseColors.length - 1];
         }
+        System.out.println(Arrays.toString(expandedPalette));
         return expandedPalette;
     }
 
@@ -58,7 +59,11 @@ public class PaletteGenerator {
         final int r = (int) (start.getRed() + t * (end.getRed() - start.getRed()));
         final int g = (int) (start.getGreen() + t * (end.getGreen() - start.getGreen()));
         final int b = (int) (start.getBlue() + t * (end.getBlue() - start.getBlue()));
-        return new Color(r, g, b);
+        return new Color(clamp(0, 255, r), clamp(0, 255, g), clamp(0, 255, b));
+    }
+
+    private static int clamp(int min, int max, int n) {
+        return Math.max(min, Math.min(n, max));
     }
 
     public static void main(String[] args) {

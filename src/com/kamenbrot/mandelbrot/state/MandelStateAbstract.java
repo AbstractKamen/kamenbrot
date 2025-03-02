@@ -1,5 +1,8 @@
 package com.kamenbrot.mandelbrot.state;
 
+import java.awt.*;
+import java.util.Map;
+
 public abstract class MandelStateAbstract<T extends Number> implements GenericMandelState<T> {
 
     private static final double ZOOM_FACTOR_UNIT = 0.05;
@@ -12,24 +15,18 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
     private int mandelWidth;
     private int mandelHeight;
     private int maxIterations;
+    private Map<Integer, Color> colorCache;
 
-    public MandelStateAbstract(int maxIterations, int mandelWidth, int mandelHeight) {
+    public MandelStateAbstract(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
         this.maxIterations = maxIterations;
         this.mandelHeight = mandelHeight;
         this.mandelWidth = mandelWidth;
+        this.colorCache = colorCache;
     }
 
-    public MandelStateAbstract(MandelState mandelState) {
-        this.zoomFactor = mandelState.getZoomFactor();
-        this.zoom = mandelState.getCurrentZoom();
-        this.juliaToggle = mandelState.isJuliaToggled();
-        this.saveToggle = mandelState.isSaveToggled();
-        this.smoothToggle = mandelState.isSmoothToggled();
-        this.performanceToggle = mandelState.isPerformanceToggled();
-        this.mandelWidth = mandelState.getMandelWidth();
-        this.mandelHeight = mandelState.getMandelHeight();
-        this.maxIterations = mandelState.getMaxIterations();
-        this.maxIterations = mandelState.getMaxIterations();
+    @Override
+    public void clearColorCache() {
+        colorCache.clear();
     }
 
     protected abstract void calcZoom(double z);
@@ -86,6 +83,11 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
     @Override
     public int getMandelWidth() {
         return mandelWidth;
+    }
+
+    @Override
+    public Map<Integer, Color> getColorCache() {
+        return colorCache;
     }
 
     @Override

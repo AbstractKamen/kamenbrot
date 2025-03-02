@@ -1,5 +1,8 @@
 package com.kamenbrot.mandelbrot.state;
 
+import java.awt.*;
+import java.util.Map;
+
 public interface MandelState {
   void incrementZoomFactor();
   void decrementZoomFactor();
@@ -36,4 +39,7 @@ public interface MandelState {
 
   void resetCoordinates();
   int getMaxIterations();
+
+  void clearColorCache();
+  Map<Integer, Color> getColorCache();
 }

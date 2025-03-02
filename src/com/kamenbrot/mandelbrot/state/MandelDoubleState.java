@@ -2,6 +2,9 @@ package com.kamenbrot.mandelbrot.state;
 
 import com.kamenbrot.mandelbrot.fractals.Mapping;
 
+import java.awt.*;
+import java.util.Map;
+
 public class MandelDoubleState extends MandelStateAbstract<Double> {
 
     private double minX = MIN_X;
@@ -12,12 +15,12 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
     private double centerY;
     private double savedMaxX = maxX;
 
-    public MandelDoubleState(int maxIterations, int mandelWidth, int mandelHeight) {
-        super(maxIterations, mandelWidth, mandelHeight);
+    public MandelDoubleState(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
+        super(maxIterations, mandelWidth, mandelHeight, colorCache);
     }
 
-    public MandelDoubleState(PanelState panelState) {
-        this(panelState.getMaxIterations(), panelState.getWidth(), panelState.getHeight());
+    public MandelDoubleState(PanelState panelState, Map<Integer, Color> colorCache) {
+        this(panelState.getMaxIterations(), panelState.getWidth(), panelState.getHeight(), colorCache);
     }
 
     @Override
