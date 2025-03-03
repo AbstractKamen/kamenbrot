@@ -28,11 +28,7 @@ public class CpuJulia {
             case MandelDoubleState doubleState -> {
                 final double real = ComplexMapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
                 final double imaginary = ComplexMapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
-                if (mandelState.isSmoothToggled()) {
-                    yield CpuMandelbrot.fractalIteration_smooth(new Complex(real, imaginary), mandelState.getMaxIterations(), JULIA_START);
-                } else {
-                    yield CpuMandelbrot.fractalIteration(new Complex(real, imaginary), mandelState.getMaxIterations(), JULIA_START);
-                }
+                yield CpuMandelbrot.fractalIteration(new Complex(real, imaginary), mandelState.getMaxIterations(), JULIA_START, mandelState);
             }
             default -> throw new UnsupportedOperationException("State Not Implemented");
         };

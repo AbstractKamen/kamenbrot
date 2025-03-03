@@ -108,7 +108,8 @@ public class MandelbrotBlockImageGenerator extends BlockImageGeneratorAbstract {
                     if (mandelState.isSmoothToggled()) {
                         image.setRGB(px, py, mandelState.getColorCache().computeIfAbsent(it, panelState::getColor_smooth).getRGB());
                     } else {
-                        image.setRGB(px, py, mandelState.getColorCache().computeIfAbsent(it, panelState::getColor).getRGB());
+                        // no need to cache
+                        image.setRGB(px, py, panelState.getColor(it).getRGB());
                     }
                 }
             }

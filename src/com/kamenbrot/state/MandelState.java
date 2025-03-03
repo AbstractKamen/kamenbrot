@@ -42,4 +42,5 @@ public interface MandelState {
 
   void clearColorCache();
   Map<Integer, Color> getColorCache();
+  int getNextIteration(int iteration);
 }

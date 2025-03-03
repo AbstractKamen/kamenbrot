@@ -14,19 +14,10 @@ public class CpuMandelbrot {
 
     public static final double LOG_4 = Math.log(4);
 
-    public static int fractalIteration(Complex z, int maxIterations, Complex c) {
-        for (int i = 0; i < maxIterations; i++) {
+    public static int fractalIteration(Complex z, int maxIterations, Complex c, MandelState mandelState) {
+        for (int i = 0; i < maxIterations; i = mandelState.getNextIteration(i)) {
             z = z.times(z).plus(c);
             if (z.re() * z.re() + z.im() * z.im() > 4) return i;
-        }
-        return maxIterations;
-    }
-
-    public static int fractalIteration_smooth(Complex z, int maxIterations, Complex c) {
-        for (int i = 0; i < maxIterations; i++) {
-            z = z.times(z).plus(c);
-            if (z.re() * z.re() + z.im() * z.im() > 4)
-                return (int) (i + 1 - Math.log(Math.log(z.re() * z.re() + z.im() * z.im())) / LOG_4);
         }
         return maxIterations;
     }
@@ -39,11 +30,7 @@ public class CpuMandelbrot {
             case MandelDoubleState doubleState -> {
                 final double real = ComplexMapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
                 final double imaginary = ComplexMapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
-                if (mandelState.isSmoothToggled()) {
-                    yield fractalIteration_smooth(new Complex(0, 0), mandelState.getMaxIterations(), new Complex(real, imaginary));
-                } else {
-                    yield fractalIteration(new Complex(0, 0), mandelState.getMaxIterations(), new Complex(real, imaginary));
-                }
+                yield fractalIteration(new Complex(0, 0), mandelState.getMaxIterations(), new Complex(real, imaginary), mandelState);
             }
             default -> throw new UnsupportedOperationException("State Not Implemented");
         };

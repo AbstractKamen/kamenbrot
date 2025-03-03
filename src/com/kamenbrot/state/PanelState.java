@@ -59,7 +59,7 @@ public class PanelState {
         if (iterations == maxIterations) return Color.BLACK; // Escape case
 
         double normalized = (double) iterations / maxIterations; // Normalize to [0,1]
-        double exponent = 1.5; // S value (adjust for different effects)
+        double exponent = 1.8; // S value (adjust for different effects)
         int paletteSize = colors.length; // N in the formula
 
         double v = Math.pow(normalized, exponent) * paletteSize; // Exponentially scale

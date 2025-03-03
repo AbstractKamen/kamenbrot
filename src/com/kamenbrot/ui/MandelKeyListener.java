@@ -1,6 +1,5 @@
 package com.kamenbrot.ui;
 
-import com.kamenbrot.ProperMandelbrot;
 import com.kamenbrot.generators.JuliaBlockImageGenerator;
 import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.io.MandelOutput;
@@ -17,9 +16,9 @@ public class MandelKeyListener extends KeyAdapter {
     private static final int GIF_FRAME_DELAY_CENTI_SECONDS = 6;
     private final MandelState mandelState;
     private final PanelState panelState;
-    private final ProperMandelbrot parentComponent;
+    private final ProperMandelbrotPanel parentComponent;
 
-    public MandelKeyListener(MandelState mandelState, PanelState panelState, ProperMandelbrot parentComponent) {
+    public MandelKeyListener(MandelState mandelState, PanelState panelState, ProperMandelbrotPanel parentComponent) {
         this.mandelState = mandelState;
         this.panelState = panelState;
         this.parentComponent = parentComponent;
@@ -50,6 +49,10 @@ public class MandelKeyListener extends KeyAdapter {
                 break;
             case 'G':
                 MandelOutput.makeGif(panelState.getOutputDir(), panelState.getIdentifier(), GIF_FRAME_DELAY_CENTI_SECONDS);
+                break;
+            case 'i':
+                parentComponent.setShowInfo(!parentComponent.getShowInfo());
+                parentComponent.repaint();
                 break;
             case 'S':
                 mandelState.toggleSmooth();
