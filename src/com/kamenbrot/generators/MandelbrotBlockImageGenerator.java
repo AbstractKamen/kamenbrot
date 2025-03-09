@@ -1,6 +1,7 @@
 package com.kamenbrot.generators;
 
 import com.kamenbrot.fractals.mandelbrot.CpuMandelbrot;
+import com.kamenbrot.state.ColorState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PanelState;
 
@@ -16,25 +17,27 @@ public class MandelbrotBlockImageGenerator extends BlockImageGeneratorAbstract {
     private PanelState panelState;
     private int[] mandelCache;
     private BufferedImage image;
+    private ColorState colorState;
 
-    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState) {
-        this(mandelState, panelState, (ForkJoinPool) Executors.newWorkStealingPool(), panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], new BufferedImage(mandelState.getMandelWidth(), mandelState.getMandelHeight(), BufferedImage.TYPE_INT_RGB));
+    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, ColorState colorState) {
+        this(mandelState, panelState, pool, panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], new BufferedImage(mandelState.getMandelWidth(), mandelState.getMandelHeight(), BufferedImage.TYPE_INT_RGB), colorState);
     }
 
-    public MandelbrotBlockImageGenerator(MandelbrotBlockImageGenerator other, MandelState mandelState, PanelState panelState) {
-        this(mandelState, panelState, other.getPool(), other.getBlockSize(), other.mandelCache, other.image);
+    public MandelbrotBlockImageGenerator(MandelbrotBlockImageGenerator other, MandelState mandelState, PanelState panelState, ColorState colorState) {
+        this(mandelState, panelState, other.getPool(), other.getBlockSize(), other.mandelCache, other.image, colorState);
     }
 
-    public MandelbrotBlockImageGenerator(ImageGenerator imageGenerator, MandelState mandelState, PanelState panelState) {
-        this(mandelState, panelState, (ForkJoinPool) Executors.newWorkStealingPool(), panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], imageGenerator.getImage());
+    public MandelbrotBlockImageGenerator(ImageGenerator imageGenerator, MandelState mandelState, PanelState panelState, ColorState colorState) {
+        this(mandelState, panelState, (ForkJoinPool) Executors.newWorkStealingPool(), panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], imageGenerator.getImage(), colorState);
     }
 
-    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, int blockSize, int[] mandelCache, BufferedImage image) {
+    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, int blockSize, int[] mandelCache, BufferedImage image, ColorState colorState) {
         super(pool, blockSize);
         this.mandelState = mandelState;
         this.panelState = panelState;
         this.mandelCache = mandelCache;
         this.image = image;
+        this.colorState = colorState;
     }
 
     @Override
@@ -106,10 +109,10 @@ public class MandelbrotBlockImageGenerator extends BlockImageGeneratorAbstract {
                         it = mandelCache[index] = mandelbrotAt(px, py);
                     }
                     if (mandelState.isSmoothToggled()) {
-                        image.setRGB(px, py, mandelState.getColorCache().computeIfAbsent(it, panelState::getColor_smooth).getRGB());
+                        image.setRGB(px, py, mandelState.getColorCache().computeIfAbsent(it, k -> colorState.getColor_smooth(k, mandelState.getMaxIterations())).getRGB());
                     } else {
                         // no need to cache
-                        image.setRGB(px, py, panelState.getColor(it).getRGB());
+                        image.setRGB(px, py, colorState.getColor(it, mandelState.getMaxIterations()).getRGB());
                     }
                 }
             }

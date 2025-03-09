@@ -29,7 +29,6 @@ public interface MandelState {
   void toggleSmooth();
   void toggleJulia();
   void toggleSave();
-  void togglePerformance();
 
   int getMandelHeight();
   int getMandelWidth();

@@ -17,7 +17,7 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
     private int maxIterations;
     private Map<Integer, Color> colorCache;
     private int[] iterationSteps;
-    private double iterationSkipFactor = 0.4;
+    private double iterationSkipFactor = 0.1;
 
     public MandelStateAbstract(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
         this.maxIterations = maxIterations;
@@ -67,11 +67,6 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
     @Override
     public void toggleSave() {
         this.saveToggle = !saveToggle;
-    }
-
-    @Override
-    public void togglePerformance() {
-        this.performanceToggle = !performanceToggle;
     }
 
     @Override
@@ -153,11 +148,11 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
     /**
      * Computes each iteration step using "Exponential Threshold-Based Growth" in order to reduce the total number of iterations
      */
-    private void recomputeIterationSteps() {
+    public void recomputeIterationSteps() {
         for (int i = 0; i < iterationSteps.length; i++) {
             // f(x)=x+(e^x/T) - smallest step being 1
             iterationSteps[i] = Math.max(1, (int) (Math.pow(Math.E, ((double) i) / maxIterations * 10 * iterationSkipFactor)));
-            System.out.println(iterationSteps[i]);
+            // System.out.println(iterationSteps[i]);
         }
     }
 

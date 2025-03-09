@@ -5,6 +5,7 @@ import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.io.MandelOutput;
 import com.kamenbrot.palette.CoolColors;
 import com.kamenbrot.palette.PaletteGenerator;
+import com.kamenbrot.state.ColorState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PanelState;
@@ -12,24 +13,28 @@ import com.kamenbrot.state.PanelState;
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 
 public class ProperMandelbrotPanel extends JPanel {
 
     private PanelState panelState;
     private MandelState mandelState;
+    private ColorState colorState;
     private ImageGenerator imageGenerator;
     private boolean showInfo = false;
 
-    public ProperMandelbrotPanel() {
+    public ProperMandelbrotPanel(ForkJoinPool pool) {
 //        final Color[] layer1 = PaletteGenerator.generatePalette(CoolColors.getFireColors(), 16);
 //        final Color[] layer2 = PaletteGenerator.generatePalette(CoolColors.getOceanColors(), 16);
 //        final Color[] layer3 = PaletteGenerator.generatePalette(CoolColors.getFireIceColors(), 16);
 //        final Color[] layer4 = PaletteGenerator.generatePalette(CoolColors.getToxicColors(), 16);
 //        final Color[] palette = PaletteGenerator.getLayeredColors(layer1, layer2, layer3, layer4);
-        final Color[] palette = PaletteGenerator.getLayeredColors(PaletteGenerator.generatePalette(CoolColors.getCoolColors1(), 16), 4);
-        this.panelState = new PanelState(800, 600, palette);
+        final Color[] palette = PaletteGenerator.getLayeredColors(PaletteGenerator.generatePalette(CoolColors.getCoolColors69(), 64), 2);
+        this.panelState = new PanelState(800, 600);
         this.mandelState = new MandelDoubleState(panelState, new ConcurrentHashMap<>());
-        this.imageGenerator = new MandelbrotBlockImageGenerator(mandelState, panelState);
+        this.colorState = new ColorState(palette);
+        this.imageGenerator = new MandelbrotBlockImageGenerator(mandelState, panelState, pool, colorState);
         final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
         generateAndSaveImageIfToggled();
@@ -79,5 +84,9 @@ public class ProperMandelbrotPanel extends JPanel {
 
     public void setShowInfo(boolean showInfo) {
         this.showInfo = showInfo;
+    }
+
+    public ColorState getColorState() {
+        return colorState;
     }
 }
