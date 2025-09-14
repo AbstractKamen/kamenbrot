@@ -26,6 +26,7 @@ public class MandelMain {
     frame.setLayout(new BorderLayout());
     frame.add(lpane, BorderLayout.CENTER);
     lpane.setLayout(null);
+
     final ForkJoinPool pool = (ForkJoinPool) Executors.newWorkStealingPool();
     final ProperMandelbrotPanel panel = new ProperMandelbrotPanel(pool);
 
@@ -91,8 +92,7 @@ public class MandelMain {
       @Override
       public void mousePressed(MouseEvent e) {
         panel.getMandelState().setCenter(e.getX(), e.getY());
-        panel.generateAndSaveImageIfToggled();
-        panel.repaint();
+        panel.setNeedsRender();
       }
 
       @Override
@@ -103,8 +103,7 @@ public class MandelMain {
         } else {
           state.zoomOut(panel.getPanelState().getZoomUnits());
         }
-        panel.generateAndSaveImageIfToggled();
-        panel.repaint();
+        panel.setNeedsRender();
       }
     };
     panel.addMouseListener(mouseAdapter);
