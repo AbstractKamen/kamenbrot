@@ -1,7 +1,9 @@
 package com.kamenbrot;
 
 import com.kamenbrot.fractals.ComplexMapping;
-import com.kamenbrot.state.ColorState;
+import com.kamenbrot.generators.PanelRenderer;
+import com.kamenbrot.palette.PaletteState;
+import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.ui.MandelKeyListener;
@@ -28,14 +30,17 @@ public class MandelMain {
     lpane.setLayout(null);
 
     final ForkJoinPool pool = (ForkJoinPool) Executors.newWorkStealingPool();
-    final ProperMandelbrotPanel panel = new ProperMandelbrotPanel(pool);
+    final PanelRenderer renderer = new PanelRenderer();
+    final PaletteState paletteState = new PaletteState();
+    final Color[] palette = paletteState.getNextPalette();
+    final ProperMandelbrotPanel panel = new ProperMandelbrotPanel(pool, renderer, paletteState);
 
     final int mandelWidth = panel.getMandelState().getMandelWidth();
     final int mandelHeight = panel.getMandelState().getMandelHeight();
     final int miniWidth = (int) (mandelWidth * 0.25);
     final int miniHeight = (int) (mandelHeight * 0.25);
 
-    final MiniPanel miniPanel = new MiniPanel(panel.getPanelState(), pool, miniWidth, miniHeight, new ColorState(panel.getColorState().getPalette()));
+    final MiniPanel miniPanel = new MiniPanel(panel.getPanelState(), pool, miniWidth, miniHeight, new ColourState(palette), renderer);
     panel.setOpaque(true);
     panel.setBounds(0, 0, mandelWidth, mandelHeight);
     miniPanel.setOpaque(true);
@@ -74,7 +79,7 @@ public class MandelMain {
     frame.pack();
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
-    frame.addKeyListener(new MandelKeyListener(panel.getMandelState(), panel.getPanelState(), panel, miniPanel));
+    frame.addKeyListener(new MandelKeyListener(panel.getMandelState(), panel.getPanelState(), panel, miniPanel, paletteState));
 
     final MouseAdapter mouseAdapter = new MouseAdapter() {
 
@@ -85,8 +90,7 @@ public class MandelMain {
         final double re = ComplexMapping.mapComplex(e.getX(), mandelState.getMandelWidth(), mandelState.getMinX(), mandelState.getMaxX());
         final double imag = ComplexMapping.mapComplex(e.getY(), mandelState.getMandelHeight(), mandelState.getMinY(), mandelState.getMaxY());
         miniPanel.setPos(re, imag);
-        miniPanel.getMiniImageGen().generateImage();
-        miniPanel.repaint();
+        miniPanel.setNeedsRender();
       }
 
       @Override

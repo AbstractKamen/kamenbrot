@@ -2,7 +2,8 @@ package com.kamenbrot.ui;
 
 import com.kamenbrot.generators.ImageGenerator;
 import com.kamenbrot.generators.JuliaBlockImageGenerator;
-import com.kamenbrot.state.ColorState;
+import com.kamenbrot.generators.PanelRenderer;
+import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PanelState;
@@ -11,37 +12,27 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-public class MiniPanel extends JPanel implements AutoCloseable {
+public class MiniPanel extends JPanel {
 
   private JuliaBlockImageGenerator miniImageGen;
   private MandelDoubleState miniMandelState;
-  private ColorState colorState;
-  private volatile boolean needsRender;
-  private final ScheduledExecutorService exec;
+  private ColourState colourState;
+  private PanelRenderer.RenderTask renderTask;
 
-  public MiniPanel(PanelState panelState, ForkJoinPool pool, int width, int height, ColorState colorState) {
+  public MiniPanel(PanelState panelState, ForkJoinPool pool, int width, int height, ColourState colourState, PanelRenderer renderer) {
 	final int[] miniCache = new int[width * height];
 	final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	this.miniMandelState = new MandelDoubleState(240, width, height, new HashMap<>());
 	miniMandelState.setCenter((int) ((width * 1.2) / 2), height >> 1);
-	this.miniImageGen = new JuliaBlockImageGenerator<>(miniMandelState, panelState, colorState, pool, panelState.getBlockSize(), miniCache, bufferedImage, 0.0d, 0.0d);
-	this.colorState = colorState;
+	this.miniImageGen = new JuliaBlockImageGenerator<>(miniMandelState, panelState, colourState, pool, panelState.getBlockSize(), miniCache, bufferedImage, 0.0d, 0.0d);
+	this.colourState = colourState;
 	miniImageGen.generateImage();
-	this.exec = Executors.newSingleThreadScheduledExecutor();
-	this.exec.scheduleAtFixedRate(() -> {
-	  if (needsRender) {
-		needsRender = false;
-		SwingUtilities.invokeLater(() -> {
-		  miniImageGen.generateImage();
-		  repaint();
-		});
-	  }
-	}, 0, 16, TimeUnit.MILLISECONDS);
+	this.renderTask = renderer.addRenderTask(() -> {
+	  miniImageGen.generateImage();
+	  repaint();
+	});
   }
 
   @Override
@@ -63,17 +54,15 @@ public class MiniPanel extends JPanel implements AutoCloseable {
 	return miniMandelState;
   }
 
-  public ColorState getColorState() {
-	return colorState;
+  public ColourState getColorState() {
+	return colourState;
   }
 
   public void setPos(double re, double imag) {
 	miniImageGen.setPos(re, imag);
   }
 
-
-  @Override
-  public void close() {
-	this.exec.shutdownNow();
+  public void setNeedsRender() {
+	renderTask.setNeedsRender(true);
   }
 }

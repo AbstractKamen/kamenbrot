@@ -1,7 +1,7 @@
 package com.kamenbrot.generators;
 
 import com.kamenbrot.fractals.mandelbrot.CpuMandelbrot;
-import com.kamenbrot.state.ColorState;
+import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PanelState;
 
@@ -17,27 +17,27 @@ public class MandelbrotBlockImageGenerator extends BlockImageGeneratorAbstract {
     private PanelState panelState;
     private int[] mandelCache;
     private BufferedImage image;
-    private ColorState colorState;
+    private ColourState colourState;
 
-    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, ColorState colorState) {
-        this(mandelState, panelState, pool, panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], new BufferedImage(mandelState.getMandelWidth(), mandelState.getMandelHeight(), BufferedImage.TYPE_INT_RGB), colorState);
+    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, ColourState colourState) {
+        this(mandelState, panelState, pool, panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], new BufferedImage(mandelState.getMandelWidth(), mandelState.getMandelHeight(), BufferedImage.TYPE_INT_RGB), colourState);
     }
 
-    public MandelbrotBlockImageGenerator(MandelbrotBlockImageGenerator other, MandelState mandelState, PanelState panelState, ColorState colorState) {
-        this(mandelState, panelState, other.getPool(), other.getBlockSize(), other.mandelCache, other.image, colorState);
+    public MandelbrotBlockImageGenerator(MandelbrotBlockImageGenerator other, MandelState mandelState, PanelState panelState, ColourState colourState) {
+        this(mandelState, panelState, other.getPool(), other.getBlockSize(), other.mandelCache, other.image, colourState);
     }
 
-    public MandelbrotBlockImageGenerator(ImageGenerator imageGenerator, MandelState mandelState, PanelState panelState, ColorState colorState) {
-        this(mandelState, panelState, (ForkJoinPool) Executors.newWorkStealingPool(), panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], imageGenerator.getImage(), colorState);
+    public MandelbrotBlockImageGenerator(ImageGenerator imageGenerator, MandelState mandelState, PanelState panelState, ColourState colourState) {
+        this(mandelState, panelState, (ForkJoinPool) Executors.newWorkStealingPool(), panelState.getBlockSize(), new int[mandelState.getMandelWidth() * mandelState.getMandelHeight()], imageGenerator.getImage(), colourState);
     }
 
-    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, int blockSize, int[] mandelCache, BufferedImage image, ColorState colorState) {
+    public MandelbrotBlockImageGenerator(MandelState mandelState, PanelState panelState, ForkJoinPool pool, int blockSize, int[] mandelCache, BufferedImage image, ColourState colourState) {
         super(pool, blockSize);
         this.mandelState = mandelState;
         this.panelState = panelState;
         this.mandelCache = mandelCache;
         this.image = image;
-        this.colorState = colorState;
+        this.colourState = colourState;
     }
 
     @Override
@@ -109,10 +109,10 @@ public class MandelbrotBlockImageGenerator extends BlockImageGeneratorAbstract {
                         it = mandelCache[index] = mandelbrotAt(px, py);
                     }
                     if (mandelState.isSmoothToggled()) {
-                        image.setRGB(px, py, mandelState.getColorCache().computeIfAbsent(it, k -> colorState.getColor_smooth(k, mandelState.getMaxIterations())).getRGB());
+                        image.setRGB(px, py, mandelState.getColorCache().computeIfAbsent(it, k -> colourState.getColour_smooth(k, mandelState.getMaxIterations())).getRGB());
                     } else {
                         // no need to cache
-                        image.setRGB(px, py, colorState.getColor(it, mandelState.getMaxIterations()).getRGB());
+                        image.setRGB(px, py, colourState.getColour(it, mandelState.getMaxIterations()).getRGB());
                     }
                 }
             }

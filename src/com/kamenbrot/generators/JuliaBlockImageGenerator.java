@@ -1,7 +1,7 @@
 package com.kamenbrot.generators;
 
 import com.kamenbrot.fractals.mandelbrot.CpuJulia;
-import com.kamenbrot.state.ColorState;
+import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.GenericMandelState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PanelState;
@@ -24,14 +24,14 @@ public class JuliaBlockImageGenerator<T extends Number> extends MandelbrotBlockI
   private T re;
   private T imag;
 
-  public JuliaBlockImageGenerator(ImageGenerator imageGenerator, GenericMandelState<T> mandelState, PanelState panelState, ColorState colorState) {
-    super(imageGenerator, mandelState, panelState, colorState);
+  public JuliaBlockImageGenerator(ImageGenerator imageGenerator, GenericMandelState<T> mandelState, PanelState panelState, ColourState colourState) {
+    super(imageGenerator, mandelState, panelState, colourState);
     this.re = mandelState.getCenterX();
     this.imag = mandelState.getCenterY();
   }
 
-  public JuliaBlockImageGenerator(MandelState mandelState, PanelState panelState, ColorState colorState, ForkJoinPool pool, int blockSize, int[] mandelCache, BufferedImage image, T re, T imag) {
-    super(mandelState, panelState, pool, blockSize, mandelCache, image, colorState);
+  public JuliaBlockImageGenerator(MandelState mandelState, PanelState panelState, ColourState colourState, ForkJoinPool pool, int blockSize, int[] mandelCache, BufferedImage image, T re, T imag) {
+    super(mandelState, panelState, pool, blockSize, mandelCache, image, colourState);
     this.re = re;
     this.imag = imag;
   }

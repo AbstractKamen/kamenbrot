@@ -51,7 +51,6 @@ public class PaletteGenerator {
         } else {
             expandedPalette[newSize - 1] = baseColors[baseColors.length - 1];
         }
-        System.out.println(Arrays.toString(expandedPalette));
         return expandedPalette;
     }
 
