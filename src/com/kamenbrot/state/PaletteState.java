@@ -1,4 +1,7 @@
-package com.kamenbrot.palette;
+package com.kamenbrot.state;
+
+import com.kamenbrot.palette.CoolColors;
+import com.kamenbrot.palette.PaletteGenerator;
 
 import java.awt.*;
 

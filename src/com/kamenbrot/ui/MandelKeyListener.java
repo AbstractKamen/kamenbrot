@@ -3,7 +3,7 @@ package com.kamenbrot.ui;
 import com.kamenbrot.generators.JuliaBlockImageGenerator;
 import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.io.MandelOutput;
-import com.kamenbrot.palette.PaletteState;
+import com.kamenbrot.state.PaletteState;
 import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.GenericMandelState;
 import com.kamenbrot.state.MandelState;

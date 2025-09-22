@@ -2,7 +2,7 @@ package com.kamenbrot;
 
 import com.kamenbrot.fractals.ComplexMapping;
 import com.kamenbrot.generators.PanelRenderer;
-import com.kamenbrot.palette.PaletteState;
+import com.kamenbrot.state.PaletteState;
 import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;

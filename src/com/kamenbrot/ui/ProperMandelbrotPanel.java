@@ -4,7 +4,7 @@ import com.kamenbrot.generators.ImageGenerator;
 import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.generators.PanelRenderer;
 import com.kamenbrot.io.MandelOutput;
-import com.kamenbrot.palette.PaletteState;
+import com.kamenbrot.state.PaletteState;
 import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
