@@ -1,11 +1,9 @@
 package com.kamenbrot;
 
 import com.kamenbrot.fractals.ComplexMapping;
+import com.kamenbrot.fractals.DoubleDouble;
 import com.kamenbrot.generators.PanelRenderer;
-import com.kamenbrot.state.PaletteState;
-import com.kamenbrot.state.ColourState;
-import com.kamenbrot.state.MandelDoubleState;
-import com.kamenbrot.state.MandelState;
+import com.kamenbrot.state.*;
 import com.kamenbrot.ui.MandelKeyListener;
 import com.kamenbrot.ui.MiniPanel;
 import com.kamenbrot.ui.ProperMandelbrotPanel;
@@ -86,9 +84,9 @@ public class MandelMain {
       @Override
       public void mouseMoved(MouseEvent e) {
         if (panel.getMandelState().isJuliaToggled() || panel.getMandelState().isSaveToggled()) return;
-        final MandelDoubleState mandelState = (MandelDoubleState) panel.getMandelState();
-        final double re = ComplexMapping.mapComplex(e.getX(), mandelState.getMandelWidth(), mandelState.getMinX(), mandelState.getMaxX());
-        final double imag = ComplexMapping.mapComplex(e.getY(), mandelState.getMandelHeight(), mandelState.getMinY(), mandelState.getMaxY());
+        final MandelDoubleDoubleState mandelState = (MandelDoubleDoubleState) panel.getMandelState();
+        final DoubleDouble re = ComplexMapping.mapComplex(mandelState.cachedValue(e.getX()), mandelState.cachedValue(mandelState.getMandelWidth()), mandelState.getMinX(), mandelState.getMaxX());
+        final DoubleDouble imag = ComplexMapping.mapComplex(mandelState.cachedValue(e.getY()), mandelState.cachedValue(mandelState.getMandelHeight()), mandelState.getMinY(), mandelState.getMaxY());
         miniPanel.setPos(re, imag);
         miniPanel.setNeedsRender();
       }

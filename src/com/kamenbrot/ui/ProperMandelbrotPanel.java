@@ -4,11 +4,7 @@ import com.kamenbrot.generators.ImageGenerator;
 import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.generators.PanelRenderer;
 import com.kamenbrot.io.MandelOutput;
-import com.kamenbrot.state.PaletteState;
-import com.kamenbrot.state.ColourState;
-import com.kamenbrot.state.MandelDoubleState;
-import com.kamenbrot.state.MandelState;
-import com.kamenbrot.state.PanelState;
+import com.kamenbrot.state.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +23,7 @@ public class ProperMandelbrotPanel extends JPanel {
 
   public ProperMandelbrotPanel(ForkJoinPool pool, PanelRenderer renderer, PaletteState paletteState) {
 	this.panelState = new PanelState(800, 600);
-	this.mandelState = new MandelDoubleState(panelState, new ConcurrentHashMap<>());
+	this.mandelState = new MandelDoubleDoubleState(panelState, new ConcurrentHashMap<>());
 	this.colourState = new ColourState(paletteState.getCurrentPalette());
 	this.imageGenerator = new MandelbrotBlockImageGenerator(mandelState, panelState, pool, colourState);
 	final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -50,10 +46,12 @@ public class ProperMandelbrotPanel extends JPanel {
 	super.paintComponent(g);
 	g.drawImage(imageGenerator.getImage(), 0, 0, null);
 	g.setColor(Color.GREEN);
-	final int textSpacing = 15;
+	final int textSpacing = 12;
 	g.drawString("Press 'i' to show more info", textSpacing, textSpacing);
 	int i = 2;
 	if (showInfo) {
+	  final GenericMandelState<?> stateCast = (GenericMandelState<?>) mandelState;
+	  g.drawString(String.format("Current center x[%s], y[%s]", stateCast.getCenterX(), stateCast.getCenterY()), textSpacing, textSpacing * i++);
 	  g.drawString(String.format("Press '+' or '-' to adjust zoom factor. Currently %.2f. Current mandelbrot: %s", mandelState.getZoomFactor(), mandelState.getClass().getSimpleName()), textSpacing, textSpacing * i++);
 	  g.drawString(String.format("Press 'H' to reset zoom and mouse wheel to adjust zoom. Current zoom %.2fx.", mandelState.getCurrentZoom()), textSpacing, textSpacing * i++);
 	  g.drawString("Press 'S' to save on zoom. Currently " + (mandelState.isSaveToggled() ? "active" : "inactive"), textSpacing, textSpacing * i++);

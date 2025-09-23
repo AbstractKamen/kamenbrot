@@ -1,6 +1,8 @@
 package com.kamenbrot.fractals.mandelbrot;
 
 import com.kamenbrot.fractals.ComplexMapping;
+import com.kamenbrot.fractals.DoubleDouble;
+import com.kamenbrot.state.MandelDoubleDoubleState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
 
@@ -26,6 +28,32 @@ public class CpuMandelbrot {
     return maxIterations;
   }
 
+  public static int fractalIteration(DoubleDouble zRe, DoubleDouble zIm, int maxIterations, DoubleDouble cRe, DoubleDouble cIm, MandelState mandelState) {
+    DoubleDouble savedRe = null;
+    DoubleDouble savedIm = null;
+    for (int i = 0; i < maxIterations; i = mandelState.getNextIteration(i)) {
+      final DoubleDouble zReSq = zRe.mul(zRe);
+      final DoubleDouble zImSq = zIm.mul(zIm);
+
+      if (i % 20 == 0) {
+        savedRe = zRe;
+        savedIm = zIm;
+      } else if (zRe.epsilonGreaterThanDifference(savedRe) &&
+              zIm.epsilonGreaterThanDifference(savedIm)) {
+        return i; // periodic
+      }
+
+      if (zReSq.add(zImSq).compareTo(DoubleDouble.FOUR) > 0) return i;
+      DoubleDouble zReCSq = zReSq.sub(zImSq);
+      DoubleDouble t = zRe.mul(zIm);
+      DoubleDouble zImCSq = t.add(t);
+      zRe = zReCSq.add(cRe);
+      zIm = zImCSq.add(cIm);
+      // z = z.times(z).plus(c);
+    }
+    return maxIterations;
+  }
+
   public static int mandelbrotAt(int x, int y, MandelState mandelState) {
     return switch (mandelState) {
       case MandelState s when s.isPerformanceToggled() && (x % s.maxSkipped() == 0 && y % s.maxSkipped() == 0) -> {
@@ -35,6 +63,11 @@ public class CpuMandelbrot {
         final double real = ComplexMapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
         final double imaginary = ComplexMapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
         yield fractalIteration(0.0d, 0.0d, mandelState.getMaxIterations(), real, imaginary, mandelState);
+      }
+      case MandelDoubleDoubleState doubleState -> {
+        final DoubleDouble real = ComplexMapping.mapComplex(doubleState.cachedValue(x), doubleState.cachedValue(mandelState.getMandelWidth()), doubleState.getMinX(), doubleState.getMaxX());
+        final DoubleDouble imaginary = ComplexMapping.mapComplex(doubleState.cachedValue(y), doubleState.cachedValue(mandelState.getMandelHeight()), doubleState.getMinY(), doubleState.getMaxY());
+        yield fractalIteration(DoubleDouble.ZERO, DoubleDouble.ZERO, mandelState.getMaxIterations(), real, imaginary, mandelState);
       }
       default -> throw new UnsupportedOperationException("State Not Implemented");
     };

@@ -77,7 +77,9 @@ public class MandelKeyListener extends KeyAdapter {
 		miniPanel.setVisible(false);
 		while (!mandelState.isZoomInReached()) {
 		  mandelState.zoomIn(1);
-		  parentComponent.setNeedsRender();
+
+		  parentComponent.generateAndSaveImageIfToggled();
+		  parentComponent.repaint();
 		}
 		break;
 	  case 'h':

@@ -9,6 +9,11 @@ public class ComplexMapping {
     return min + (double) value / limit * (max - min);
   }
 
+  public static DoubleDouble mapComplex(DoubleDouble value, DoubleDouble limit, DoubleDouble min, DoubleDouble max) {
+    final DoubleDouble fraction = value.div(limit);
+    return min.add(fraction.mul(max.sub(min)));
+  }
+
   public static BigDecimal mapComplex(BigDecimal value, BigDecimal limit, BigDecimal min, BigDecimal max, MathContext mc) {
     return min.add(value
                      .divide(limit, mc)

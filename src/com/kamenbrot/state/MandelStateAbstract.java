@@ -18,7 +18,7 @@ public abstract class MandelStateAbstract<T extends Number> implements GenericMa
   private int maxIterations;
   private Map<Integer, Color> colorCache;
   private final int[] iterationSteps;
-  private double iterationSkipFactor = 0.1;
+  private double iterationSkipFactor = 0.3;
 
   public MandelStateAbstract(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
 	this.maxIterations = maxIterations;

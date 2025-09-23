@@ -18,7 +18,7 @@ public class MandelOutput {
 
     public static void saveImage(File dirFile, BufferedImage image) {
         try {
-            if (!dirFile.exists()) dirFile.mkdir();
+            if (!dirFile.exists()) dirFile.mkdirs();
             final File outputImage = new File(dirFile, System.currentTimeMillis() + ".jpg");
             outputImage.createNewFile();
             ImageIO.write(image, "jpg", outputImage);

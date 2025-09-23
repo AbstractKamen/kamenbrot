@@ -14,13 +14,24 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
   private double centerX;
   private double centerY;
   private double savedMaxX = maxX;
+  private final Double[] cache;
 
-  public MandelDoubleState(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
+    public MandelDoubleState(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
 	super(maxIterations, mandelWidth, mandelHeight, colorCache);
+      final int len = mandelWidth * mandelHeight;
+      cache = new Double[len];
+      for (int i = 0; i < len; i++) {
+          cache[i] = (double) i;
+      }
   }
 
   public MandelDoubleState(PanelState panelState, Map<Integer, Color> colorCache) {
 	this(panelState.getMaxIterations(), panelState.getWidth(), panelState.getHeight(), colorCache);
+  }
+
+  @Override
+  public Double cachedValue(int i) {
+      return cache[i];
   }
 
   @Override

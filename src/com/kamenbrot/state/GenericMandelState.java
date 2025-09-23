@@ -9,6 +9,8 @@ public interface GenericMandelState<T extends Number> extends MandelState {
     double MIN_Y = -1.5;
     double MAX_Y = 1.5;
 
+    T cachedValue(int i);
+
     T getCenterX();
     T getCenterY();
 

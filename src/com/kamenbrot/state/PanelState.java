@@ -1,8 +1,5 @@
 package com.kamenbrot.state;
 
-import com.kamenbrot.palette.PaletteGenerator;
-
-import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -10,9 +7,9 @@ import java.time.LocalDateTime;
 public class PanelState {
 
     private static final String OUTPUT_PATH = "out/mandelbrot";
-    private static final int MAX_ITERATIONS = 1400;
+    private static final int MAX_ITERATIONS = 2800;
     private static final int BLOCK_SIZE = 256;
-    private static final int OPTIMIZATION_BLOCK_SIZE = 2;
+    private static final int OPTIMIZATION_BLOCK_SIZE = 4;
     private static final int ZOOM_UNITS = 1;
     private static final int JOURNEY_UNITS = 1;
 
@@ -97,5 +94,4 @@ public class PanelState {
         this.width = width;
         this.height = height;
     }
-
 }
