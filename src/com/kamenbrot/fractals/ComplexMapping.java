@@ -14,6 +14,10 @@ public class ComplexMapping {
     return min.add(fraction.mul(max.sub(min)));
   }
 
+  public static DoubleDouble mapComplexOptimised(DoubleDouble value, DoubleDouble limit, DoubleDouble min, DoubleDouble max) {
+    return value.mapComplex(limit, min, max);
+  }
+
   public static BigDecimal mapComplex(BigDecimal value, BigDecimal limit, BigDecimal min, BigDecimal max, MathContext mc) {
     return min.add(value
                      .divide(limit, mc)

@@ -85,8 +85,8 @@ public class MandelMain {
       public void mouseMoved(MouseEvent e) {
         if (panel.getMandelState().isJuliaToggled() || panel.getMandelState().isSaveToggled()) return;
         final MandelDoubleDoubleState mandelState = (MandelDoubleDoubleState) panel.getMandelState();
-        final DoubleDouble re = ComplexMapping.mapComplex(mandelState.cachedValue(e.getX()), mandelState.cachedValue(mandelState.getMandelWidth()), mandelState.getMinX(), mandelState.getMaxX());
-        final DoubleDouble imag = ComplexMapping.mapComplex(mandelState.cachedValue(e.getY()), mandelState.cachedValue(mandelState.getMandelHeight()), mandelState.getMinY(), mandelState.getMaxY());
+        final DoubleDouble re = ComplexMapping.mapComplexOptimised(mandelState.cachedValue(e.getX()), mandelState.cachedValue(mandelState.getMandelWidth()), mandelState.getMinX(), mandelState.getMaxX());
+        final DoubleDouble imag = ComplexMapping.mapComplexOptimised(mandelState.cachedValue(e.getY()), mandelState.cachedValue(mandelState.getMandelHeight()), mandelState.getMinY(), mandelState.getMaxY());
         miniPanel.setPos(re, imag);
         miniPanel.setNeedsRender();
       }

@@ -72,8 +72,8 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
 
   @Override
   public void setCenter(int x, int y) {
-	this.centerX = ComplexMapping.mapComplex(cache[x], cache[getMandelWidth()], minX, maxX);
-	this.centerY = ComplexMapping.mapComplex(cache[y], cache[getMandelHeight()], minY, maxY);
+	this.centerX = ComplexMapping.mapComplexOptimised(cache[x], cache[getMandelWidth()], minX, maxX);
+	this.centerY = ComplexMapping.mapComplexOptimised(cache[y], cache[getMandelHeight()], minY, maxY);
 	calcZoom(1);
   }
 

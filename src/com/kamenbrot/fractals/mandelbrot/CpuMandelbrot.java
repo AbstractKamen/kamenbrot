@@ -43,7 +43,7 @@ public class CpuMandelbrot {
         return i; // periodic
       }
 
-      if (zReSq.add(zImSq).compareTo(DoubleDouble.FOUR) > 0) return i;
+      if (zReSq.addGreaterThanFour(zImSq)) return i;
       DoubleDouble zReCSq = zReSq.sub(zImSq);
       DoubleDouble t = zRe.mul(zIm);
       DoubleDouble zImCSq = t.add(t);
@@ -65,8 +65,8 @@ public class CpuMandelbrot {
         yield fractalIteration(0.0d, 0.0d, mandelState.getMaxIterations(), real, imaginary, mandelState);
       }
       case MandelDoubleDoubleState doubleState -> {
-        final DoubleDouble real = ComplexMapping.mapComplex(doubleState.cachedValue(x), doubleState.cachedValue(mandelState.getMandelWidth()), doubleState.getMinX(), doubleState.getMaxX());
-        final DoubleDouble imaginary = ComplexMapping.mapComplex(doubleState.cachedValue(y), doubleState.cachedValue(mandelState.getMandelHeight()), doubleState.getMinY(), doubleState.getMaxY());
+        final DoubleDouble real = ComplexMapping.mapComplexOptimised(doubleState.cachedValue(x), doubleState.cachedValue(mandelState.getMandelWidth()), doubleState.getMinX(), doubleState.getMaxX());
+        final DoubleDouble imaginary = ComplexMapping.mapComplexOptimised(doubleState.cachedValue(y), doubleState.cachedValue(mandelState.getMandelHeight()), doubleState.getMinY(), doubleState.getMaxY());
         yield fractalIteration(DoubleDouble.ZERO, DoubleDouble.ZERO, mandelState.getMaxIterations(), real, imaginary, mandelState);
       }
       default -> throw new UnsupportedOperationException("State Not Implemented");

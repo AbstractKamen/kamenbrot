@@ -26,8 +26,8 @@ public class CpuJulia {
         yield CpuMandelbrot.fractalIteration(real, imaginary, mandelState.getMaxIterations(), re.doubleValue(), imag.doubleValue(), mandelState);
       }
       case MandelDoubleDoubleState doubleState -> {
-        final DoubleDouble real = ComplexMapping.mapComplex(doubleState.cachedValue(x), doubleState.cachedValue(mandelState.getMandelWidth()), doubleState.getMinX(), doubleState.getMaxX());
-        final DoubleDouble imaginary = ComplexMapping.mapComplex(doubleState.cachedValue(y), doubleState.cachedValue(mandelState.getMandelHeight()), doubleState.getMinY(), doubleState.getMaxY());
+        final DoubleDouble real = ComplexMapping.mapComplexOptimised(doubleState.cachedValue(x), doubleState.cachedValue(mandelState.getMandelWidth()), doubleState.getMinX(), doubleState.getMaxX());
+        final DoubleDouble imaginary = ComplexMapping.mapComplexOptimised(doubleState.cachedValue(y), doubleState.cachedValue(mandelState.getMandelHeight()), doubleState.getMinY(), doubleState.getMaxY());
         yield CpuMandelbrot.fractalIteration(real, imaginary, mandelState.getMaxIterations(), (DoubleDouble) re, (DoubleDouble) imag, mandelState);
       }
       default -> throw new UnsupportedOperationException("State Not Implemented");
