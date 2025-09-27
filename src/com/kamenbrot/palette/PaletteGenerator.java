@@ -1,6 +1,6 @@
 package com.kamenbrot.palette;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Arrays;
 
 public class PaletteGenerator {

@@ -19,7 +19,7 @@ public class PanelRenderer {
 
   public RenderTask addRenderTask(Runnable runnable) {
 	final RenderTask task = new RenderTask(runnable);
-	this.exec.scheduleAtFixedRate(task, 0, 16, TimeUnit.MILLISECONDS);
+	this.exec.scheduleAtFixedRate(task, 0, 32, TimeUnit.MILLISECONDS);
 	return task;
   }
 

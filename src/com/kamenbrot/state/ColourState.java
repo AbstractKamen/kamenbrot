@@ -1,6 +1,6 @@
 package com.kamenbrot.state;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class ColourState {
 

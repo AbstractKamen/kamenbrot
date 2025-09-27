@@ -1,6 +1,6 @@
 package com.kamenbrot.palette;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class CoolColors {
 
@@ -227,4 +227,75 @@ public class CoolColors {
         };
     }
 
+    public static Color[] getAuroraColors() {
+        return new Color[]{
+                new Color(0, 10, 30),
+                new Color(0, 40, 80),
+                new Color(0, 120, 100),
+                new Color(50, 200, 150),
+                new Color(150, 255, 200),
+                new Color(200, 240, 255),
+                new Color(120, 180, 255),
+                new Color(40, 100, 200),
+                new Color(10, 30, 80),
+                new Color(0, 0, 0)
+        };
+    }
+
+    public static Color[] getSunsetColors() {
+        return new Color[]{
+                new Color(20, 0, 40),
+                new Color(80, 0, 100),
+                new Color(150, 20, 120),
+                new Color(220, 60, 80),
+                new Color(255, 120, 50),
+                new Color(255, 180, 80),
+                new Color(255, 220, 120),
+                new Color(255, 250, 200),
+                new Color(0, 0, 0)
+        };
+    }
+
+    public static Color[] getCrystalColors() {
+        return new Color[]{
+                new Color(0, 30, 60),
+                new Color(0, 80, 140),
+                new Color(40, 160, 200),
+                new Color(100, 220, 240),
+                new Color(180, 255, 255),
+                new Color(255, 255, 255),
+                new Color(200, 220, 240),
+                new Color(120, 160, 200),
+                new Color(50, 80, 120),
+                new Color(10, 20, 40)
+        };
+    }
+
+    public static Color[] getNeonColors() {
+        return new Color[]{
+                new Color(10, 10, 30),
+                new Color(50, 0, 100),
+                new Color(120, 0, 180),
+                new Color(255, 0, 200),
+                new Color(0, 200, 180),
+                new Color(0, 255, 120),
+                new Color(180, 255, 0),
+                new Color(255, 255, 255),
+                new Color(0, 0, 0)
+        };
+    }
+
+    public static Color[] getMonochromeSteelColors() {
+        return new Color[]{
+                new Color(10, 10, 10),
+                new Color(40, 40, 40),
+                new Color(80, 80, 80),
+                new Color(120, 120, 120),
+                new Color(160, 160, 160),
+                new Color(200, 200, 200),
+                new Color(240, 240, 240),
+                new Color(255, 255, 255),
+                new Color(0, 0, 0)
+        };
+    }
 }

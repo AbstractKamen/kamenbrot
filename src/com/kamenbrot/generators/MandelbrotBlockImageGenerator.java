@@ -5,7 +5,7 @@ import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PanelState;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.concurrent.Executors;

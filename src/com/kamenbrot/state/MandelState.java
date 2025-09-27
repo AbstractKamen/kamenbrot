@@ -1,6 +1,6 @@
 package com.kamenbrot.state;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Map;
 
 public interface MandelState {
@@ -41,5 +41,4 @@ public interface MandelState {
 
   void clearColorCache();
   Map<Integer, Color> getColorCache();
-  int getNextIteration(int iteration);
 }

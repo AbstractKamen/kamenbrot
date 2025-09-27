@@ -27,13 +27,18 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return new DoubleDouble(value);
     }
 
-    // cool arithmetic
+    // cooler arithmetic
     public DoubleDouble add(DoubleDouble b) {
+        // Knuth twosum
         double s = this.hi + b.hi;
         double v = s - this.hi;
-        double t = (b.hi - v) + (this.hi - (s - v)) + this.lo + b.lo;
+        double e = (this.hi - (s - v)) + (b.hi - v);
+
+        double t = e + this.lo + b.lo;
+
         double newHi = s + t;
         double newLo = t - (newHi - s);
+
         return new DoubleDouble(newHi, newLo);
     }
 
@@ -41,7 +46,7 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return this.add(new DoubleDouble(-b.hi, -b.lo));
     }
 
-    private static final double SPLIT = (1L << 27) + 1; // 2^27+1, works for IEEE double
+    private static final double SPLIT = (1L << 27) + 1; // 2^27+1, works for IEEE double 134_217_729
 
     public DoubleDouble mul(DoubleDouble b) {
         double p = this.hi * b.hi;
@@ -59,7 +64,8 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         double q = this.hi * b.lo + this.lo * b.hi;
 
         double newHi = p + (err + q);
-        double newLo = (p - newHi) + (err + q) + this.lo * b.lo;
+        double newLo = (p - newHi) + (err + q)
+                ;// + this.lo * b.lo
 
         return new DoubleDouble(newHi, newLo);
     }
@@ -170,7 +176,7 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
             double q = divResHi * maxSubMInResLo + divResLo * maxSubMinResHi;
 
             divResMulMaxSubMinResHi = p + (err + q);
-            divResMulMaxSubMinResLo = (p - divResMulMaxSubMinResHi) + (err + q) + divResLo * maxSubMInResLo;
+            divResMulMaxSubMinResLo = (p - divResMulMaxSubMinResHi) + (err + q);
         }
 
         // min.add(divResMulMaxSubMinRes)

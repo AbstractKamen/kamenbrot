@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 public class PanelState {
 
     private static final String OUTPUT_PATH = "out/mandelbrot";
-    private static final int MAX_ITERATIONS = 2800;
+    private static final int MAX_ITERATIONS = 6900;
     private static final int BLOCK_SIZE = 256;
-    private static final int OPTIMIZATION_BLOCK_SIZE = 4;
+    private static final int OPTIMIZATION_BLOCK_SIZE = 16;
     private static final int ZOOM_UNITS = 1;
     private static final int JOURNEY_UNITS = 1;
 

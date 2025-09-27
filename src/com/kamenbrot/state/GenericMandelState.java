@@ -1,7 +1,5 @@
 package com.kamenbrot.state;
 
-import java.math.MathContext;
-
 public interface GenericMandelState<T extends Number> extends MandelState {
 
     double MIN_X = -2.0;
@@ -18,8 +16,4 @@ public interface GenericMandelState<T extends Number> extends MandelState {
     T getMinY();
     T getMaxX();
     T getMaxY();
-
-    default MathContext getMathContext() {
-      return MathContext.DECIMAL64;
-    }
 }

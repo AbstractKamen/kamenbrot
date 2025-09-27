@@ -3,29 +3,31 @@ package com.kamenbrot.ui;
 import com.kamenbrot.generators.JuliaBlockImageGenerator;
 import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.io.MandelOutput;
-import com.kamenbrot.state.PaletteState;
 import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.GenericMandelState;
+import com.kamenbrot.state.MandelDoubleDoubleState;
+import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
+import com.kamenbrot.state.PaletteState;
 import com.kamenbrot.state.PanelState;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import static com.kamenbrot.MandelMain.PRECISION_SWITCH_ZOOM_LEVEL;
 
 public class MandelKeyListener extends KeyAdapter {
   /**
    * One hundredth of a second (1/100)
    */
   private static final int GIF_FRAME_DELAY_CENTI_SECONDS = 6;
-  private final MandelState mandelState;
   private final PanelState panelState;
   private final ProperMandelbrotPanel parentComponent;
   private final MiniPanel miniPanel;
   private final PaletteState paletteState;
 
-  public MandelKeyListener(MandelState mandelState, PanelState panelState, ProperMandelbrotPanel parentComponent, MiniPanel miniPanel, PaletteState paletteState) {
-	this.mandelState = mandelState;
+  public MandelKeyListener(PanelState panelState, ProperMandelbrotPanel parentComponent, MiniPanel miniPanel, PaletteState paletteState) {
 	this.panelState = panelState;
 	this.parentComponent = parentComponent;
 	this.miniPanel = miniPanel;
@@ -36,24 +38,24 @@ public class MandelKeyListener extends KeyAdapter {
   public void keyPressed(KeyEvent e) {
 	switch (e.getKeyChar()) {
 	  case 's':
-		mandelState.toggleSave();
+		parentComponent.getMandelState().toggleSave();
 		miniPanel.setVisible(false);
 		parentComponent.setNeedsRender();
 		break;
 	  case 'j':
-		if (mandelState.isJuliaToggled() || mandelState.isSaveToggled()) return;
+		if (parentComponent.getMandelState().isJuliaToggled() || parentComponent.getMandelState().isSaveToggled()) return;
 		miniPanel.setVisible(!miniPanel.isVisible());
 		if (miniPanel.isVisible()) miniPanel.setNeedsRender();
 		break;
 	  case 'J':
-		mandelState.toggleJulia();
-		mandelState.resetCoordinates();
+		parentComponent.getMandelState().toggleJulia();
+		parentComponent.getMandelState().resetCoordinates();
 		final ColourState colourState = parentComponent.getColorState();
-		if (mandelState.isJuliaToggled()) {
-		  parentComponent.setImageGenerator(new JuliaBlockImageGenerator<>(parentComponent.getImageGenerator(), (GenericMandelState<?>) mandelState, panelState, colourState));
+		if (parentComponent.getMandelState().isJuliaToggled()) {
+		  parentComponent.setImageGenerator(new JuliaBlockImageGenerator<>(parentComponent.getImageGenerator(), (GenericMandelState<?>) parentComponent.getMandelState(), panelState, colourState));
 		  miniPanel.setVisible(false);
 		} else {
-		  parentComponent.setImageGenerator(new MandelbrotBlockImageGenerator(parentComponent.getImageGenerator(), mandelState, panelState, colourState));
+		  parentComponent.setImageGenerator(new MandelbrotBlockImageGenerator(parentComponent.getImageGenerator(), parentComponent.getMandelState(), panelState, colourState));
 		}
 		parentComponent.setNeedsRender();
 		break;
@@ -65,8 +67,8 @@ public class MandelKeyListener extends KeyAdapter {
 		parentComponent.setNeedsRender();
 		break;
 	  case 'S':
-		mandelState.toggleSmooth();
-		mandelState.clearColorCache();
+		parentComponent.getMandelState().toggleSmooth();
+		parentComponent.getMandelState().clearColorCache();
 		parentComponent.setNeedsRender();
 
 		miniPanel.getMiniMandelState().toggleSmooth();
@@ -75,24 +77,33 @@ public class MandelKeyListener extends KeyAdapter {
 		break;
 	  case 'g':
 		miniPanel.setVisible(false);
-		while (!mandelState.isZoomInReached()) {
-		  mandelState.zoomIn(1);
-
+		while (!parentComponent.getMandelState().isZoomInReached()) {
+          final MandelState state = parentComponent.getMandelState();
+          state.zoomIn(1);
+          if (state instanceof MandelDoubleState cast && state.getCurrentZoom() > PRECISION_SWITCH_ZOOM_LEVEL) {
+              final MandelState newMandelState = new MandelDoubleDoubleState(cast);
+              parentComponent.setMandelState(newMandelState);
+              parentComponent.setImageGenerator(new MandelbrotBlockImageGenerator(parentComponent.getImageGenerator(), newMandelState, parentComponent.getPanelState(), parentComponent.getColorState()));
+          } else if (state instanceof MandelDoubleDoubleState cast && state.getCurrentZoom() <= PRECISION_SWITCH_ZOOM_LEVEL) {
+              final MandelState newMandelState = new MandelDoubleState(cast);
+              parentComponent.setMandelState(newMandelState);
+              parentComponent.setImageGenerator(new MandelbrotBlockImageGenerator(parentComponent.getImageGenerator(), newMandelState, parentComponent.getPanelState(), parentComponent.getColorState()));
+          }
 		  parentComponent.generateAndSaveImageIfToggled();
 		  parentComponent.repaint();
 		}
 		break;
 	  case 'h':
-		mandelState.saveCurrentZoom();
-		mandelState.resetCoordinates();
+		parentComponent.getMandelState().saveCurrentZoom();
+		parentComponent.getMandelState().resetCoordinates();
 		parentComponent.setNeedsRender();
 		break;
 	  case '+':
-		mandelState.incrementZoomFactor();
+		parentComponent.getMandelState().incrementZoomFactor();
 		parentComponent.setNeedsRender();
 		break;
 	  case '-':
-		mandelState.decrementZoomFactor();
+		parentComponent.getMandelState().decrementZoomFactor();
 		parentComponent.setNeedsRender();
 		break;
 	  case 'c': {
@@ -100,7 +111,7 @@ public class MandelKeyListener extends KeyAdapter {
 		parentComponent.getColorState().setColours(palette);
 		miniPanel.getColorState().setColours(palette);
 
-		mandelState.clearColorCache();
+		parentComponent.getMandelState().clearColorCache();
 		parentComponent.setNeedsRender();
 
 		miniPanel.getMiniMandelState().clearColorCache();
@@ -112,7 +123,7 @@ public class MandelKeyListener extends KeyAdapter {
 		parentComponent.getColorState().setColours(palette);
 		miniPanel.getColorState().setColours(palette);
 
-		mandelState.clearColorCache();
+		parentComponent.getMandelState().clearColorCache();
 		parentComponent.setNeedsRender();
 
 		miniPanel.getMiniMandelState().clearColorCache();
@@ -124,7 +135,7 @@ public class MandelKeyListener extends KeyAdapter {
 		parentComponent.getColorState().setColours(palette);
 		miniPanel.getColorState().setColours(palette);
 
-		mandelState.clearColorCache();
+		parentComponent.getMandelState().clearColorCache();
 		parentComponent.setNeedsRender();
 
 		miniPanel.getMiniMandelState().clearColorCache();
