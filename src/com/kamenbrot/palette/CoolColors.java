@@ -73,22 +73,22 @@ public class CoolColors {
 
     public static Color[] getCoolColors2() {
         Color[] c = new Color[16];
-        c[0] = new Color(7, 25, 26);
-        c[1] = new Color(1, 9, 47);
-        c[2] = new Color(4, 4, 73);
-        c[3] = new Color(7, 0, 100);
-        c[4] = new Color(44, 12, 138);
-        c[5] = new Color(82, 24, 177);
-        c[6] = new Color(125, 57, 209);
-        c[7] = new Color(181, 134, 229);
-        c[8] = new Color(236, 211, 248);
-        c[9] = new Color(233, 241, 191);
-        c[10] = new Color(201, 248, 95);
-        c[11] = new Color(170, 255, 0);
-        c[12] = new Color(128, 204, 0);
-        c[13] = new Color(87, 153, 0);
-        c[14] = new Color(52, 106, 3);
-        c[15] = new Color(30, 66, 15);
+        c[0] = new Color(7, 25, 26, 100);
+        c[1] = new Color(1, 9, 47, 100);
+        c[2] = new Color(4, 4, 73, 100);
+        c[3] = new Color(7, 0, 100, 100);
+        c[4] = new Color(44, 12, 138, 100);
+        c[5] = new Color(82, 24, 177, 100);
+        c[6] = new Color(125, 57, 209, 100);
+        c[7] = new Color(181, 134, 229, 100);
+        c[8] = new Color(236, 211, 248, 100);
+        c[9] = new Color(233, 241, 191, 100);
+        c[10] = new Color(201, 248, 95, 100);
+        c[11] = new Color(170, 255, 0, 100);
+        c[12] = new Color(128, 204, 0, 100);
+        c[13] = new Color(87, 153, 0, 100);
+        c[14] = new Color(52, 106, 3, 100);
+        c[15] = new Color(30, 66, 15, 100);
         return c;
     }
 

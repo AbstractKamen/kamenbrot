@@ -28,6 +28,8 @@ import java.util.concurrent.ForkJoinPool;
 public class MandelMain {
 
     public static final int PRECISION_SWITCH_ZOOM_LEVEL = 32;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
 
     public static void main(String[] args) {
         final JFrame frame = new JFrame("Mandelbrot Set");
@@ -82,7 +84,7 @@ public class MandelMain {
 
         });
         frame.setMinimumSize(new Dimension(mandelWidth, mandelHeight));
-        frame.setMaximumSize(new Dimension(1600, 1200));
+        frame.setMaximumSize(new Dimension(WIDTH, HEIGHT));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -117,11 +119,11 @@ public class MandelMain {
                 if (state instanceof MandelDoubleState cast && state.getCurrentZoom() > PRECISION_SWITCH_ZOOM_LEVEL) {
                     final MandelState newMandelState = new MandelDoubleDoubleState(cast);
                     panel.setMandelState(newMandelState);
-                    panel.setImageGenerator(new MandelbrotBlockImageGenerator(panel.getImageGenerator(), newMandelState, panel.getPanelState(), panel.getColorState()));
+                    panel.setImageGenerator(new MandelbrotBlockImageGenerator((MandelbrotBlockImageGenerator) panel.getImageGenerator(), newMandelState, panel.getPanelState(), panel.getColorState()));
                 } else if (state instanceof MandelDoubleDoubleState cast && state.getCurrentZoom() <= PRECISION_SWITCH_ZOOM_LEVEL) {
                     final MandelState newMandelState = new MandelDoubleState(cast);
                     panel.setMandelState(newMandelState);
-                    panel.setImageGenerator(new MandelbrotBlockImageGenerator(panel.getImageGenerator(), newMandelState, panel.getPanelState(), panel.getColorState()));
+                    panel.setImageGenerator(new MandelbrotBlockImageGenerator((MandelbrotBlockImageGenerator) panel.getImageGenerator(), newMandelState, panel.getPanelState(), panel.getColorState()));
                 }
                 panel.setNeedsRender();
             }

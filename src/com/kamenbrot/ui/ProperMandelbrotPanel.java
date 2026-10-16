@@ -1,12 +1,12 @@
 package com.kamenbrot.ui;
 
+import com.kamenbrot.MandelMain;
 import com.kamenbrot.generators.ImageGenerator;
 import com.kamenbrot.generators.MandelbrotBlockImageGenerator;
 import com.kamenbrot.generators.PanelRenderer;
 import com.kamenbrot.io.MandelOutput;
 import com.kamenbrot.state.ColourState;
 import com.kamenbrot.state.GenericMandelState;
-import com.kamenbrot.state.MandelDoubleDoubleState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
 import com.kamenbrot.state.PaletteState;
@@ -33,7 +33,7 @@ public class ProperMandelbrotPanel extends JPanel {
     private final PaletteState paletteState;
 
     public ProperMandelbrotPanel(ForkJoinPool pool, PanelRenderer renderer, PaletteState paletteState) {
-        this.panelState = new PanelState(800, 600);
+        this.panelState = new PanelState(MandelMain.WIDTH, MandelMain.HEIGHT);
         this.mandelState = new MandelDoubleState(panelState, new ConcurrentHashMap<>());
         this.colourState = new ColourState(paletteState.getCurrentPalette());
         this.imageGenerator = new MandelbrotBlockImageGenerator(mandelState, panelState, pool, colourState);

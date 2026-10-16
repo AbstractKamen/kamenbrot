@@ -1,7 +1,6 @@
 package com.kamenbrot.state;
 
 import com.kamenbrot.palette.ColorPalette;
-import com.kamenbrot.palette.CoolColors;
 import com.kamenbrot.palette.PaletteGenerator;
 
 import java.awt.Color;
@@ -9,7 +8,7 @@ import java.awt.Color;
 public class PaletteState {
 
   private static final int MIN_PALETTE_SIZE = 16;
-  private static final int MAX_PALETTE_SIZE = 1024 * 16;
+  private static final int MAX_PALETTE_SIZE = 1024 * 64;
 
   private volatile int paletteIndex;
   private volatile int paletteSize = MIN_PALETTE_SIZE;

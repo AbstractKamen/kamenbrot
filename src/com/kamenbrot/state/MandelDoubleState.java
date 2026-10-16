@@ -1,6 +1,7 @@
 package com.kamenbrot.state;
 
 import com.kamenbrot.fractals.ComplexMapping;
+import com.kamenbrot.fractals.DoubleDouble;
 
 import java.awt.Color;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
     private double centerY;
     private double savedMaxX = maxX;
     private final Double[] cache;
+    private SavedDoubleDoubleState savedDoubleDoubleState;
 
     public MandelDoubleState(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
         super(maxIterations, mandelWidth, mandelHeight, colorCache);
@@ -27,6 +29,15 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
 
     public MandelDoubleState(PanelState panelState, Map<Integer, Color> colorCache) {
         this(panelState.getMaxIterations(), panelState.getWidth(), panelState.getHeight(), colorCache);
+    }
+
+    record SavedDoubleDoubleState(DoubleDouble minX,
+                                  DoubleDouble maxX,
+                                  DoubleDouble minY,
+                                  DoubleDouble maxY,
+                                  DoubleDouble centerX,
+                                  DoubleDouble centerY,
+                                  DoubleDouble savedMaxX) {
     }
 
     public MandelDoubleState(MandelDoubleDoubleState other) {
@@ -44,6 +55,14 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
         this.centerX = other.getCenterX().doubleValue();
         this.centerY = other.getCenterY().doubleValue();
         this.savedMaxX = other.getSavedMaxX().doubleValue();
+
+        this.savedDoubleDoubleState = new SavedDoubleDoubleState(other.getMinX(),
+                other.getMaxX(),
+                other.getMinY(),
+                other.getMaxY(),
+                other.getCenterX(),
+                other.getCenterY(),
+                other.getSavedMaxX());
     }
 
     @Override
@@ -125,5 +144,9 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
 
     public double getSavedMaxX() {
         return savedMaxX;
+    }
+
+    public SavedDoubleDoubleState getSavedDoubleDoubleState() {
+        return savedDoubleDoubleState;
     }
 }

@@ -38,14 +38,24 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
         for (int i = 0; i < len; i++) {
             cache[i] = DoubleDouble.valueOf(i);
         }
-
-        this.minX = DoubleDouble.valueOf(other.getMinX());
-        this.maxX = DoubleDouble.valueOf(other.getMaxX());
-        this.minY = DoubleDouble.valueOf(other.getMinY());
-        this.maxY = DoubleDouble.valueOf(other.getMaxY());
-        this.centerX = DoubleDouble.valueOf(other.getCenterX());
-        this.centerY = DoubleDouble.valueOf(other.getCenterY());
-        this.savedMaxX = DoubleDouble.valueOf(other.getSavedMaxX());
+        final MandelDoubleState.SavedDoubleDoubleState savedDoubleDoubleState = other.getSavedDoubleDoubleState();
+        if (savedDoubleDoubleState != null) {
+            this.minX = savedDoubleDoubleState.minX();
+            this.maxX = savedDoubleDoubleState.maxX();
+            this.minY = savedDoubleDoubleState.minY();
+            this.maxY = savedDoubleDoubleState.maxY();
+            this.centerX = savedDoubleDoubleState.centerX();
+            this.centerY = savedDoubleDoubleState.centerY();
+            this.savedMaxX = savedDoubleDoubleState.savedMaxX();
+        } else {
+            this.minX = DoubleDouble.valueOf(other.getMinX());
+            this.maxX = DoubleDouble.valueOf(other.getMaxX());
+            this.minY = DoubleDouble.valueOf(other.getMinY());
+            this.maxY = DoubleDouble.valueOf(other.getMaxY());
+            this.centerX = DoubleDouble.valueOf(other.getCenterX());
+            this.centerY = DoubleDouble.valueOf(other.getCenterY());
+            this.savedMaxX = DoubleDouble.valueOf(other.getSavedMaxX());
+        }
     }
 
     @Override
