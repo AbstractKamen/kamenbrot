@@ -1,7 +1,7 @@
 package com.kamenbrot.fractals.mandelbrot;
 
 import com.kamenbrot.fractals.ComplexMapping;
-import com.kamenbrot.fractals.DoubleDouble;
+import com.kamenbrot.fractals.MutableDoubleDouble;
 import com.kamenbrot.state.MandelDoubleDoubleState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
@@ -25,8 +25,8 @@ public class CpuMandelbrot {
                 yield fractalIteration(0.0d, 0.0d, mandelState.getMaxIterations(), real, imaginary, mandelState);
             }
             case MandelDoubleDoubleState doubleState -> {
-                final DoubleDouble real = doubleState.cachedValue(x).mapComplex(mandelState.getMandelWidth(), 0.0d, doubleState.getMinX(), doubleState.getMaxX());
-                final DoubleDouble imaginary = doubleState.cachedValue(y).mapComplex(mandelState.getMandelHeight(), 0.0d, doubleState.getMinY(), doubleState.getMaxY());
+                final MutableDoubleDouble real = doubleState.cachedValue(x).mapComplex(mandelState.getMandelWidth(), 0.0d, doubleState.getMinX(), doubleState.getMaxX());
+                final MutableDoubleDouble imaginary = doubleState.cachedValue(y).mapComplex(mandelState.getMandelHeight(), 0.0d, doubleState.getMinY(), doubleState.getMaxY());
                 double cReHi = real.hi();
                 double cReLo = real.lo();
                 double cImHi = imaginary.hi();
@@ -59,7 +59,7 @@ public class CpuMandelbrot {
         return maxIterations;
     }
 
-    public static int fractalIteration(DoubleDouble zRe, DoubleDouble zIm, int maxIterations, double cReHi, double cReLo, double cImHi, double cImLo, MandelState mandelState) {
+    public static int fractalIteration(MutableDoubleDouble zRe, MutableDoubleDouble zIm, int maxIterations, double cReHi, double cReLo, double cImHi, double cImLo, MandelState mandelState) {
         double savedZreHi = zRe.hi();
         double savedZreLo = zRe.lo();
         double savedZimHi = zRe.hi();

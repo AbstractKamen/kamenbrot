@@ -17,14 +17,13 @@ public class RingBuffer<T> {
         return items.length;
     }
 
-    public boolean enqueue(T item) {
+    public void enqueue(T item) {
         items[(start + count) & mask] = item;
         if (count == capacity()) {
             start = (start + 1) & mask;
         } else {
             count++;
         }
-        return true;
     }
 
     @SuppressWarnings("unchecked")

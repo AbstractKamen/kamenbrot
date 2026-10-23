@@ -3,12 +3,12 @@ package com.kamenbrot.fractals;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-public final class DoubleDouble extends Number implements Comparable<DoubleDouble> {
+public final class MutableDoubleDouble extends Number implements Comparable<MutableDoubleDouble> {
 
-    private static final DoubleDouble ZERO = DoubleDouble.valueOf(0.0f);
-    private static final DoubleDouble EPSILON = DoubleDouble.valueOf(1e-28);
-    private static final DoubleDouble TWO = DoubleDouble.valueOf(2.0f);
-    private static final DoubleDouble FOUR = DoubleDouble.valueOf(4.0f);
+    private static final MutableDoubleDouble ZERO = MutableDoubleDouble.valueOf(0.0f);
+    private static final MutableDoubleDouble EPSILON = MutableDoubleDouble.valueOf(1e-28);
+    private static final MutableDoubleDouble TWO = MutableDoubleDouble.valueOf(2.0f);
+    private static final MutableDoubleDouble FOUR = MutableDoubleDouble.valueOf(4.0f);
 
     private double hi;
     private double lo;
@@ -21,36 +21,36 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return lo;
     }
 
-    public DoubleDouble setHiLo(double hi, double lo) {
+    public MutableDoubleDouble setHiLo(double hi, double lo) {
         this.hi = hi;
         this.lo = lo;
         return this;
     }
 
-    public DoubleDouble setHiLo(DoubleDouble other) {
+    public MutableDoubleDouble setHiLo(MutableDoubleDouble other) {
         return setHiLo(other.hi, other.lo);
     }
 
-    public DoubleDouble(double value) {
+    public MutableDoubleDouble(double value) {
         this.hi = value;
         this.lo = 0.0;
     }
 
-    public DoubleDouble timesTwo() {
+    public MutableDoubleDouble timesTwo() {
         return add(this.hi, this.lo);
     }
 
-    private DoubleDouble(double hi, double lo) {
+    private MutableDoubleDouble(double hi, double lo) {
         this.hi = hi;
         this.lo = lo;
     }
 
-    public static DoubleDouble valueOf(double value) {
-        return new DoubleDouble(value);
+    public static MutableDoubleDouble valueOf(double value) {
+        return new MutableDoubleDouble(value);
     }
 
     // cooler arithmetic
-    public DoubleDouble add(double hi, double lo) {
+    public MutableDoubleDouble add(double hi, double lo) {
         // Knuth twosum
         double s = this.hi + hi;
         double v = s - this.hi;
@@ -63,13 +63,13 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return this;
     }
 
-    public DoubleDouble sub(double hi, double lo) {
+    public MutableDoubleDouble sub(double hi, double lo) {
         return add(-hi, -lo);
     }
 
     public static final double SPLIT = (1L << 27) + 1; // 2^27+1, works for IEEE double 134_217_729
 
-    public DoubleDouble mul(double hi, double lo) {
+    public MutableDoubleDouble mul(double hi, double lo) {
         double p = this.hi * hi;
 
         // Dekker split
@@ -89,7 +89,7 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return this;
     }
 
-    public DoubleDouble div(double hi, double lo) {
+    public MutableDoubleDouble div(double hi, double lo) {
         // Initial approximation
         double q1 = this.hi / hi;
 
@@ -125,7 +125,7 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return this;
     }
 
-    public DoubleDouble mapComplex(double limitHi, double limitLo, DoubleDouble min, DoubleDouble max) {
+    public MutableDoubleDouble mapComplex(double limitHi, double limitLo, MutableDoubleDouble min, MutableDoubleDouble max) {
         // value.div(limit)
         double divResHi;
         double divResLo;
@@ -218,7 +218,7 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
         return diffHi == EPSILON.hi && diffLo <= EPSILON.lo;
     }
 
-    public boolean addGreaterThanFour(DoubleDouble b) {
+    public boolean addGreaterThanFour(MutableDoubleDouble b) {
         double s = this.hi + b.hi;
         double v = s - this.hi;
         double t = (b.hi - v) + (this.hi - (s - v)) + this.lo + b.lo;
@@ -229,7 +229,7 @@ public final class DoubleDouble extends Number implements Comparable<DoubleDoubl
     }
 
     @Override
-    public int compareTo(DoubleDouble b) {
+    public int compareTo(MutableDoubleDouble b) {
         if (this.hi < b.hi) return -1;
         if (this.hi > b.hi) return 1;
         return Double.compare(this.lo, b.lo);

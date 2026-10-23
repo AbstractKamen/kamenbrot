@@ -1,49 +1,45 @@
 package com.kamenbrot.state;
 
-import com.kamenbrot.fractals.DoubleDouble;
+import com.kamenbrot.fractals.MutableDoubleDouble;
 import com.kamenbrot.util.RingBuffer;
 
 import java.awt.Color;
 import java.util.Map;
 
-public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
+public class MandelDoubleDoubleState extends MandelStateAbstract<MutableDoubleDouble> {
 
-    private static final DoubleDouble MIN_X = new DoubleDouble(GenericMandelState.MIN_X);
-    private static final DoubleDouble MAX_X = new DoubleDouble(GenericMandelState.MAX_X);
-    private static final DoubleDouble MIN_Y = new DoubleDouble(GenericMandelState.MIN_Y);
-    private static final DoubleDouble MAX_Y = new DoubleDouble(GenericMandelState.MAX_Y);
+    private static final MutableDoubleDouble MIN_X = MutableDoubleDouble.valueOf(GenericMandelState.MIN_X);
+    private static final MutableDoubleDouble MAX_X = MutableDoubleDouble.valueOf(GenericMandelState.MAX_X);
+    private static final MutableDoubleDouble MIN_Y = MutableDoubleDouble.valueOf(GenericMandelState.MIN_Y);
+    private static final MutableDoubleDouble MAX_Y = MutableDoubleDouble.valueOf(GenericMandelState.MAX_Y);
 
-    private DoubleDouble minX = MIN_X;
-    private DoubleDouble maxX = MAX_X;
-    private DoubleDouble minY = MIN_Y;
-    private DoubleDouble maxY = MAX_Y;
-    private DoubleDouble centerX = DoubleDouble.valueOf(0.0);
-    private DoubleDouble centerY = DoubleDouble.valueOf(0.0);
-    private DoubleDouble savedMaxX = maxX;
-    private final ThreadLocal<RingBuffer<DoubleDouble>> cache;
+    private MutableDoubleDouble minX = MIN_X;
+    private MutableDoubleDouble maxX = MAX_X;
+    private MutableDoubleDouble minY = MIN_Y;
+    private MutableDoubleDouble maxY = MAX_Y;
+    private MutableDoubleDouble centerX = MutableDoubleDouble.valueOf(0.0);
+    private MutableDoubleDouble centerY = MutableDoubleDouble.valueOf(0.0);
+    private MutableDoubleDouble savedMaxX = maxX;
+    private final ThreadLocal<RingBuffer<MutableDoubleDouble>> cache;
+
+    private static RingBuffer<MutableDoubleDouble> getDoubleDoubleRingBuffer() {
+        final int len = 4096;
+        RingBuffer<MutableDoubleDouble> b = new RingBuffer<>(len);
+        for (int i = 0; i < len; i++) {
+            b.enqueue(MutableDoubleDouble.valueOf(i));
+        }
+        System.out.println("INFO: Init DoubleDouble buffer: " + b.capacity());
+        return b;
+    }
 
     public MandelDoubleDoubleState(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
         super(maxIterations, mandelWidth, mandelHeight, colorCache);
-        this.cache = ThreadLocal.withInitial(() -> {
-            final int len = 4096;
-            RingBuffer<DoubleDouble> b = new RingBuffer<>(len);
-            for (int i = 0; i < len; i++) {
-                b.enqueue(DoubleDouble.valueOf(i));
-            }
-            return b;
-        });
+        this.cache = ThreadLocal.withInitial(MandelDoubleDoubleState::getDoubleDoubleRingBuffer);
     }
 
     public MandelDoubleDoubleState(MandelDoubleState other) {
         super(other);
-        this.cache = ThreadLocal.withInitial(() -> {
-            final int len = 4096;
-            RingBuffer<DoubleDouble> b = new RingBuffer<>(len);
-            for (int i = 0; i < len; i++) {
-                b.enqueue(DoubleDouble.valueOf(i));
-            }
-            return b;
-        });
+        this.cache = ThreadLocal.withInitial(MandelDoubleDoubleState::getDoubleDoubleRingBuffer);
         final MandelDoubleState.SavedDoubleDoubleState savedDoubleDoubleState = other.getSavedDoubleDoubleState();
         if (savedDoubleDoubleState != null) {
             this.minX = savedDoubleDoubleState.minX();
@@ -54,18 +50,18 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
             this.centerY = savedDoubleDoubleState.centerY();
             this.savedMaxX = savedDoubleDoubleState.savedMaxX();
         } else {
-            this.minX = DoubleDouble.valueOf(other.getMinX());
-            this.maxX = DoubleDouble.valueOf(other.getMaxX());
-            this.minY = DoubleDouble.valueOf(other.getMinY());
-            this.maxY = DoubleDouble.valueOf(other.getMaxY());
-            this.centerX = DoubleDouble.valueOf(other.getCenterX());
-            this.centerY = DoubleDouble.valueOf(other.getCenterY());
-            this.savedMaxX = DoubleDouble.valueOf(other.getSavedMaxX());
+            this.minX = MutableDoubleDouble.valueOf(other.getMinX());
+            this.maxX = MutableDoubleDouble.valueOf(other.getMaxX());
+            this.minY = MutableDoubleDouble.valueOf(other.getMinY());
+            this.maxY = MutableDoubleDouble.valueOf(other.getMaxY());
+            this.centerX = MutableDoubleDouble.valueOf(other.getCenterX());
+            this.centerY = MutableDoubleDouble.valueOf(other.getCenterY());
+            this.savedMaxX = MutableDoubleDouble.valueOf(other.getSavedMaxX());
         }
     }
 
     @Override
-    public DoubleDouble cachedValue(int i) {
+    public MutableDoubleDouble cachedValue(int i) {
         return cache.get().dequeue().setHiLo(i, 0.0);
     }
 
@@ -74,12 +70,12 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
     }
 
     @Override
-    public DoubleDouble getCenterX() {
+    public MutableDoubleDouble getCenterX() {
         return centerX;
     }
 
     @Override
-    public DoubleDouble getCenterY() {
+    public MutableDoubleDouble getCenterY() {
         return centerY;
     }
 
@@ -94,22 +90,22 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
     }
 
     @Override
-    public DoubleDouble getMinX() {
+    public MutableDoubleDouble getMinX() {
         return minX;
     }
 
     @Override
-    public DoubleDouble getMinY() {
+    public MutableDoubleDouble getMinY() {
         return minY;
     }
 
     @Override
-    public DoubleDouble getMaxX() {
+    public MutableDoubleDouble getMaxX() {
         return maxX;
     }
 
     @Override
-    public DoubleDouble getMaxY() {
+    public MutableDoubleDouble getMaxY() {
         return maxY;
     }
 
@@ -167,7 +163,7 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
         this.maxY.setHiLo(centerY).add(rangeYhi, rangeYlo);
     }
 
-    public DoubleDouble getSavedMaxX() {
+    public MutableDoubleDouble getSavedMaxX() {
         return savedMaxX;
     }
 }

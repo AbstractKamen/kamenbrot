@@ -1,7 +1,7 @@
 package com.kamenbrot.state;
 
 import com.kamenbrot.fractals.ComplexMapping;
-import com.kamenbrot.fractals.DoubleDouble;
+import com.kamenbrot.fractals.MutableDoubleDouble;
 
 import java.awt.Color;
 import java.util.Map;
@@ -31,13 +31,13 @@ public class MandelDoubleState extends MandelStateAbstract<Double> {
         this(panelState.getMaxIterations(), panelState.getWidth(), panelState.getHeight(), colorCache);
     }
 
-    record SavedDoubleDoubleState(DoubleDouble minX,
-                                  DoubleDouble maxX,
-                                  DoubleDouble minY,
-                                  DoubleDouble maxY,
-                                  DoubleDouble centerX,
-                                  DoubleDouble centerY,
-                                  DoubleDouble savedMaxX) {
+    record SavedDoubleDoubleState(MutableDoubleDouble minX,
+                                  MutableDoubleDouble maxX,
+                                  MutableDoubleDouble minY,
+                                  MutableDoubleDouble maxY,
+                                  MutableDoubleDouble centerX,
+                                  MutableDoubleDouble centerY,
+                                  MutableDoubleDouble savedMaxX) {
     }
 
     public MandelDoubleState(MandelDoubleDoubleState other) {

@@ -1,7 +1,7 @@
 package com.kamenbrot.fractals.mandelbrot;
 
 import com.kamenbrot.fractals.ComplexMapping;
-import com.kamenbrot.fractals.DoubleDouble;
+import com.kamenbrot.fractals.MutableDoubleDouble;
 import com.kamenbrot.state.MandelDoubleDoubleState;
 import com.kamenbrot.state.MandelDoubleState;
 import com.kamenbrot.state.MandelState;
@@ -26,10 +26,10 @@ public class CpuJulia {
                 yield CpuMandelbrot.fractalIteration(real, imaginary, mandelState.getMaxIterations(), re.doubleValue(), imag.doubleValue(), mandelState);
             }
             case MandelDoubleDoubleState doubleState -> {
-                final DoubleDouble real = doubleState.cachedValue(x).mapComplex(mandelState.getMandelWidth(), 0.0, doubleState.getMinX(), doubleState.getMaxX());
-                final DoubleDouble imaginary = doubleState.cachedValue(y).mapComplex(mandelState.getMandelHeight(), 0.0, doubleState.getMinY(), doubleState.getMaxY());
-                final DoubleDouble centerRe = (DoubleDouble) re;
-                final DoubleDouble centerImag = (DoubleDouble) imag;
+                final MutableDoubleDouble real = doubleState.cachedValue(x).mapComplex(mandelState.getMandelWidth(), 0.0, doubleState.getMinX(), doubleState.getMaxX());
+                final MutableDoubleDouble imaginary = doubleState.cachedValue(y).mapComplex(mandelState.getMandelHeight(), 0.0, doubleState.getMinY(), doubleState.getMaxY());
+                final MutableDoubleDouble centerRe = (MutableDoubleDouble) re;
+                final MutableDoubleDouble centerImag = (MutableDoubleDouble) imag;
                 yield CpuMandelbrot.fractalIteration(real, imaginary, mandelState.getMaxIterations(), centerRe.hi(), centerRe.lo(), centerImag.hi(), centerImag.lo(), mandelState);
             }
             default -> throw new UnsupportedOperationException("State Not Implemented");
