@@ -14,6 +14,29 @@ public class CpuMandelbrot {
     private static final BigDecimal FOUR = new BigDecimal(4, new MathContext(50, RoundingMode.HALF_DOWN));
     public static final double EPSILON = 1e-28;
 
+    public static int mandelbrotAt(int x, int y, MandelState mandelState) {
+        return switch (mandelState) {
+            case MandelState s when s.isPerformanceToggled() && (x % s.maxSkipped() == 0 && y % s.maxSkipped() == 0) -> {
+                yield mandelState.getMaxIterations();
+            }
+            case MandelDoubleState doubleState -> {
+                final double real = ComplexMapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
+                final double imaginary = ComplexMapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
+                yield fractalIteration(0.0d, 0.0d, mandelState.getMaxIterations(), real, imaginary, mandelState);
+            }
+            case MandelDoubleDoubleState doubleState -> {
+                final DoubleDouble real = doubleState.cachedValue(x).mapComplex(mandelState.getMandelWidth(), 0.0d, doubleState.getMinX(), doubleState.getMaxX());
+                final DoubleDouble imaginary = doubleState.cachedValue(y).mapComplex(mandelState.getMandelHeight(), 0.0d, doubleState.getMinY(), doubleState.getMaxY());
+                double cReHi = real.hi();
+                double cReLo = real.lo();
+                double cImHi = imaginary.hi();
+                double cImLo = imaginary.lo();
+                yield fractalIteration(real.setHiLo(0.0, 0.0), imaginary.setHiLo(0.0, 0.0), mandelState.getMaxIterations(), cReHi, cReLo, cImHi, cImLo, mandelState);
+            }
+            default -> throw new UnsupportedOperationException("State Not Implemented");
+        };
+    }
+
     public static int fractalIteration(double zRe, double zIm, int maxIterations, double cRe, double cIm, MandelState mandelState) {
         double savedRe = 0;
         double savedIm = 0;
@@ -36,49 +59,38 @@ public class CpuMandelbrot {
         return maxIterations;
     }
 
-    public static int fractalIteration(DoubleDouble zRe, DoubleDouble zIm, int maxIterations, DoubleDouble cRe, DoubleDouble cIm, MandelState mandelState) {
-        DoubleDouble savedRe = null;
-        DoubleDouble savedIm = null;
+    public static int fractalIteration(DoubleDouble zRe, DoubleDouble zIm, int maxIterations, double cReHi, double cReLo, double cImHi, double cImLo, MandelState mandelState) {
+        double savedZreHi = zRe.hi();
+        double savedZreLo = zRe.lo();
+        double savedZimHi = zRe.hi();
+        double savedZimLo = zRe.lo();
         for (int i = 0; i < maxIterations; ++i) {
-            final DoubleDouble zReSq = zRe.mul(zRe);
-            final DoubleDouble zImSq = zIm.mul(zIm);
+            double zreHi = zRe.hi();
+            double zreLo = zRe.lo();
+            zRe.mul(zreHi, zreLo);
+            double zimHi = zIm.hi();
+            double zimLo = zIm.lo();
+            zIm.mul(zimHi, zimLo);
 
             if (i % 20 == 0) {
-                savedRe = zRe;
-                savedIm = zIm;
-            } else if (zRe.epsilonGreaterThanDifference(savedRe) &&
-                    zIm.epsilonGreaterThanDifference(savedIm)) {
+                savedZreHi = zreHi;
+                savedZreLo = zreLo;
+                savedZimHi = zimHi;
+                savedZimLo = zimLo;
+            } else if (zRe.epsilonGreaterThanDifference(savedZreHi, savedZreLo) &&
+                    zIm.epsilonGreaterThanDifference(savedZimHi, savedZimLo)) {
                 return maxIterations;
             }
 
-            if (zReSq.addGreaterThanFour(zImSq)) return i;
-            DoubleDouble zReCSq = zReSq.sub(zImSq);
-            DoubleDouble t = zRe.mul(zIm);
-            DoubleDouble zImCSq = t.add(t);
-            zRe = zReCSq.add(cRe);
-            zIm = zImCSq.add(cIm);
-            // z = z.times(z).plus(c);
+            if (zRe.addGreaterThanFour(zIm)) return i;
+            zRe.sub(zIm.hi(), zIm.lo())
+                    .add(cReHi, cReLo);
+            zIm.setHiLo(zreHi, zreLo)
+                    .mul(zimHi, zimLo)
+                    .timesTwo()
+                    .add(cImHi, cImLo);
         }
         return maxIterations;
-    }
-
-    public static int mandelbrotAt(int x, int y, MandelState mandelState) {
-        return switch (mandelState) {
-            case MandelState s when s.isPerformanceToggled() && (x % s.maxSkipped() == 0 && y % s.maxSkipped() == 0) -> {
-                yield mandelState.getMaxIterations();
-            }
-            case MandelDoubleState doubleState -> {
-                final double real = ComplexMapping.mapComplex(x, mandelState.getMandelWidth(), doubleState.getMinX(), doubleState.getMaxX());
-                final double imaginary = ComplexMapping.mapComplex(y, mandelState.getMandelHeight(), doubleState.getMinY(), doubleState.getMaxY());
-                yield fractalIteration(0.0d, 0.0d, mandelState.getMaxIterations(), real, imaginary, mandelState);
-            }
-            case MandelDoubleDoubleState doubleState -> {
-                final DoubleDouble real = ComplexMapping.mapComplexOptimised(doubleState.cachedValue(x), doubleState.cachedValue(mandelState.getMandelWidth()), doubleState.getMinX(), doubleState.getMaxX());
-                final DoubleDouble imaginary = ComplexMapping.mapComplexOptimised(doubleState.cachedValue(y), doubleState.cachedValue(mandelState.getMandelHeight()), doubleState.getMinY(), doubleState.getMaxY());
-                yield fractalIteration(DoubleDouble.ZERO, DoubleDouble.ZERO, mandelState.getMaxIterations(), real, imaginary, mandelState);
-            }
-            default -> throw new UnsupportedOperationException("State Not Implemented");
-        };
     }
 
     private int mandelbrot(BigDecimal real, BigDecimal imaginary, int maxIterations, MathContext mc) {

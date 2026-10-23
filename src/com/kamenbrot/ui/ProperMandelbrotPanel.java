@@ -62,7 +62,7 @@ public class ProperMandelbrotPanel extends JPanel {
         int i = 2;
         if (showInfo) {
             final GenericMandelState<?> stateCast = (GenericMandelState<?>) mandelState;
-            g.drawString(String.format("Current center x[%s], y[%s]", stateCast.getCenterX(), stateCast.getCenterY()), textSpacing, textSpacing * i++);
+            g.drawString(String.format("Current center x[%s], y[%s]", stateCast.getCenterXString(), stateCast.getCenterYString()), textSpacing, textSpacing * i++);
             g.drawString(String.format("Press '+' or '-' to adjust zoom factor. Currently %.2f. Current mandelbrot: %s", mandelState.getZoomFactor(), mandelState.getClass().getSimpleName()), textSpacing, textSpacing * i++);
             g.drawString(String.format("Press 'H' to reset zoom and mouse wheel to adjust zoom. Current zoom %.2fx.", mandelState.getCurrentZoom()), textSpacing, textSpacing * i++);
             g.drawString("Press 'S' to save on zoom. Currently " + (mandelState.isSaveToggled() ? "active" : "inactive"), textSpacing, textSpacing * i++);

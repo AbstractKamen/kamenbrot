@@ -1,7 +1,7 @@
 package com.kamenbrot.state;
 
-import com.kamenbrot.fractals.ComplexMapping;
 import com.kamenbrot.fractals.DoubleDouble;
+import com.kamenbrot.util.RingBuffer;
 
 import java.awt.Color;
 import java.util.Map;
@@ -17,27 +17,33 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
     private DoubleDouble maxX = MAX_X;
     private DoubleDouble minY = MIN_Y;
     private DoubleDouble maxY = MAX_Y;
-    private DoubleDouble centerX = DoubleDouble.ZERO;
-    private DoubleDouble centerY = DoubleDouble.ZERO;
+    private DoubleDouble centerX = DoubleDouble.valueOf(0.0);
+    private DoubleDouble centerY = DoubleDouble.valueOf(0.0);
     private DoubleDouble savedMaxX = maxX;
-    private final DoubleDouble[] cache;
+    private final ThreadLocal<RingBuffer<DoubleDouble>> cache;
 
     public MandelDoubleDoubleState(int maxIterations, int mandelWidth, int mandelHeight, Map<Integer, Color> colorCache) {
         super(maxIterations, mandelWidth, mandelHeight, colorCache);
-        final int len = mandelWidth * mandelHeight;
-        cache = new DoubleDouble[len];
-        for (int i = 0; i < len; i++) {
-            cache[i] = DoubleDouble.valueOf(i);
-        }
+        this.cache = ThreadLocal.withInitial(() -> {
+            final int len = 4096;
+            RingBuffer<DoubleDouble> b = new RingBuffer<>(len);
+            for (int i = 0; i < len; i++) {
+                b.enqueue(DoubleDouble.valueOf(i));
+            }
+            return b;
+        });
     }
 
     public MandelDoubleDoubleState(MandelDoubleState other) {
         super(other);
-        final int len = getMandelWidth() * getMandelHeight();
-        cache = new DoubleDouble[len];
-        for (int i = 0; i < len; i++) {
-            cache[i] = DoubleDouble.valueOf(i);
-        }
+        this.cache = ThreadLocal.withInitial(() -> {
+            final int len = 4096;
+            RingBuffer<DoubleDouble> b = new RingBuffer<>(len);
+            for (int i = 0; i < len; i++) {
+                b.enqueue(DoubleDouble.valueOf(i));
+            }
+            return b;
+        });
         final MandelDoubleState.SavedDoubleDoubleState savedDoubleDoubleState = other.getSavedDoubleDoubleState();
         if (savedDoubleDoubleState != null) {
             this.minX = savedDoubleDoubleState.minX();
@@ -60,7 +66,7 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
 
     @Override
     public DoubleDouble cachedValue(int i) {
-        return cache[i];
+        return cache.get().dequeue().setHiLo(i, 0.0);
     }
 
     public MandelDoubleDoubleState(PanelState panelState, Map<Integer, Color> colorCache) {
@@ -75,6 +81,16 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
     @Override
     public DoubleDouble getCenterY() {
         return centerY;
+    }
+
+    @Override
+    public String getCenterXString() {
+        return centerX.hi() + "...";
+    }
+
+    @Override
+    public String getCenterYString() {
+        return centerY.hi() + "...";
     }
 
     @Override
@@ -99,8 +115,8 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
 
     @Override
     public void setCenter(int x, int y) {
-        this.centerX = ComplexMapping.mapComplexOptimised(cache[x], cache[getMandelWidth()], minX, maxX);
-        this.centerY = ComplexMapping.mapComplexOptimised(cache[y], cache[getMandelHeight()], minY, maxY);
+        this.centerX.setHiLo(x, 0.0).mapComplex(getMandelWidth(), 0.0, minX, maxX);
+        this.centerY.setHiLo(y, 0.0).mapComplex(getMandelHeight(), 0.0, minY, maxY);
         calcZoom(1);
     }
 
@@ -130,13 +146,25 @@ public class MandelDoubleDoubleState extends MandelStateAbstract<DoubleDouble> {
 
     @Override
     protected void calcZoom(double z) {
-        DoubleDouble rangeX = maxX.sub(minX).mul(DoubleDouble.valueOf(z));
-        DoubleDouble rangeY = maxY.sub(minY).mul(DoubleDouble.valueOf(z));
 
-        this.minX = centerX.sub(rangeX.div(DoubleDouble.TWO));
-        this.maxX = centerX.add(rangeX.div(DoubleDouble.TWO));
-        this.minY = centerY.sub(rangeY.div(DoubleDouble.TWO));
-        this.maxY = centerY.add(rangeY.div(DoubleDouble.TWO));
+        double minXhi = minX.hi();
+        double minXlo = minX.lo();
+
+        double minYhi = minY.hi();
+        double minYlo = minY.lo();
+
+        maxX.sub(minXhi, minXlo).mul(z, 0.0).div(2.0, 0.0);
+        double rangeXhi = maxX.hi();
+        double rangeXlo = maxX.lo();
+
+        maxY.sub(minYhi, minYlo).mul(z, 0.0).div(2.0, 0.0);
+        double rangeYhi = maxY.hi();
+        double rangeYlo = maxY.lo();
+
+        this.minX.setHiLo(centerX).sub(rangeXhi, rangeXlo);
+        this.maxX.setHiLo(centerX).add(rangeXhi, rangeXlo);
+        this.minY.setHiLo(centerY).sub(rangeYhi, rangeYlo);
+        this.maxY.setHiLo(centerY).add(rangeYhi, rangeYlo);
     }
 
     public DoubleDouble getSavedMaxX() {

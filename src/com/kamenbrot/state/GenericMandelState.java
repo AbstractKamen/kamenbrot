@@ -12,6 +12,9 @@ public interface GenericMandelState<T extends Number> extends MandelState {
     T getCenterX();
     T getCenterY();
 
+    default String getCenterXString(){return getCenterX().toString();}
+    default String getCenterYString(){return getCenterY().toString();}
+
     T getMinX();
     T getMinY();
     T getMaxX();

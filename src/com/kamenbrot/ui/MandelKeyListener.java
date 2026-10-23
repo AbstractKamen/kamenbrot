@@ -69,7 +69,7 @@ public class MandelKeyListener extends KeyAdapter {
                 break;
             case 'i':
                 parentComponent.setShowInfo(!parentComponent.getShowInfo());
-                parentComponent.setNeedsRender();
+                parentComponent.repaint();
                 break;
             case 'S':
                 parentComponent.getMandelState().toggleSmooth();
@@ -145,11 +145,11 @@ public class MandelKeyListener extends KeyAdapter {
                 break;
             case '+':
                 parentComponent.getMandelState().incrementZoomFactor();
-                parentComponent.setNeedsRender();
+                parentComponent.repaint();
                 break;
             case '-':
                 parentComponent.getMandelState().decrementZoomFactor();
-                parentComponent.setNeedsRender();
+                parentComponent.repaint();
                 break;
             case 'c': {
                 final Color[] palette = paletteState.getNextPalette();
